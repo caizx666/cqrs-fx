@@ -10,6 +10,10 @@
     "cqrs",
     "saas-plat"
   ],
+  "repository": { 
+    "type" : "git", 
+    "url" : "https://github.com/saas-plat/cqrs.git"
+  },
   "author": "saas-plat.com",
   "license": "Apache License",
   "devDependencies": {

@@ -1,8 +1,7 @@
-import fs from 'fs';
-import path from 'path';
+import {safeRequire,seq,exists} from '../utils';
 
-export default class{
-  static init(options){
+export default new class{
+  constructor (options){
     options = options || {};
     this.rootConfig = __dirname;
     this.configPath = options.configPath;
@@ -10,35 +9,28 @@ export default class{
     this.initConfig = Object.assign({},options);
   }
 
- static clear(){
+  clear(){
     this.configCache = {};
   }
+
   // 加载三级配置，cqrs->globalconfig->modduleconfig
-  static get(name, moduleConfigPath){
+   get(name, moduleConfigPath){
     name = name || 'config';
     if (this.configCache[name])
       return this.configCache[name];
-    let filename = path.join(this.rootConfig, name+'.js');
-    let json;
-    if (fs.existsSync(filename)){
-      let str = fs.readFileSync(filename);
-      json = JSON.parse(str);
-    }else{
-      json = {};
-    }
+    let filename = this.rootConfig + seq + name+'.js';
+    let json = safeRequire(filename) || {};
     if (this.configPath){
-      let filename2 = path.join(this.configPath, name+'.js');
-      if (fs.existsSync(filename2)){
-        let str2 = fs.readFileSync(filename2);
-        let json2 = JSON.parse(str2)
+      let filename2 = this.configPath + seq + name+'.js';
+      if (exists(filename2)){
+        let json2 = safeRequire(filename2);
         Object.assign(json, json2);
       }
     }
     if (moduleConfigPath){
-      let filename3 = path.join(moduleConfigPath, name+'.js');
-      if (fs.existsSync(filename3)){
-        let str3 = fs.readFileSync(filename3);
-        let json3 = JSON.parse(str3)
+      let filename3 = moduleConfigPath + seq + name+'.js';
+      if (exists(filename3)){
+        let json3 = safeRequire(filename3);
         Object.assign(json, json3);
       }
     }

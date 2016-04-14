@@ -1,4 +1,5 @@
 一个漂亮的 CQRS 项目
 
-历史：
-v0.1 基本功能实现完成
+安装：
+
+npm install saas-plat/cqrs --save

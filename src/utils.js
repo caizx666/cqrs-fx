@@ -35,6 +35,33 @@ export function getFiles(file){
   return dirs;
 }
 
+
+let _interopSafeRequire = file => {
+  let obj = require(file);
+  if(obj && obj.__esModule && obj.default){
+    return obj.default;
+  }
+  return obj;
+};
+
+export function safeRequire(file) {
+  // absolute file path is not exist
+  if (path.isAbsolute(file)) {
+    //no need optimize, only invoked before service start
+    if(!isFile(file)){
+      return null;
+    }
+    //when file is exist, require direct
+    return _interopSafeRequire(file);
+  }
+  try{
+    return _interopSafeRequire(file);
+  }catch(err){
+    log(err);
+  }
+  return null;
+};
+
 export function timestamp(){
   return Date.now();
 }
