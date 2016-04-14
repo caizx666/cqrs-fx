@@ -1,0 +1,30 @@
+{
+  "name": "cqrs",
+  "version": "1.0.0",
+  "description": "cqrs framework",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test"
+  },
+  "keywords": [
+    "cqrs",
+    "saas-plat"
+  ],
+  "author": "saas-plat.com",
+  "license": "Apache License",
+  "devDependencies": {
+    "babel-cli": "^6.6.5",
+    "babel-core": "^6.7.2",
+    "babel-loader": "^6.2.4",
+    "babel-preset-es2015": "^6.5.0",
+    "babel-preset-react": "^6.5.0",
+    "babel-preset-stage-0": "^6.5.0",
+    "chai": "^3.5.0",
+    "webpack": "^1.12.14"
+  },
+  "dependencies": {
+    "mysql": "github:felixge/node-mysql",
+    "node-uuid": "^1.4.7",
+    "redis": "^2.6.0-1"
+  }
+}
