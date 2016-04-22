@@ -1,9 +1,7 @@
-import path from 'path';
-
 import config from './config';
 import {fxData, alias, getType} from './core';
 import register from './register';
-import {safeRequire, log, isDir, isFile, seq, exists, getDirs, getFiles, isString} from './utils';
+import {safeRequire, log, isDir, isFile, join, sep, exists, getDirs, getFiles, isString} from './utils';
 
 export default class{
   constructor(options){
@@ -20,7 +18,8 @@ export default class{
   }
 
   loadSubModule( name ){
-    let path = path.join(config.appPath, name);
+    if (!config.appPath) return;
+    let path = join(config.appPath, name);
       if(isDir(path)){
         var dirs = getDirs(path);
         if (dirs.length<=0) return;  // 空模块
@@ -33,7 +32,7 @@ export default class{
         }
         if (!isModule){
           for(let dir of dirs){
-            this.loadSubModule(path.join(name, dir));
+            this.loadSubModule(join(name, dir));
           }
         }else{
           this._modules.push(name)
@@ -139,8 +138,8 @@ export default class{
       return instance;
     }
 
-  compile(srcPath, outPath, options = {}){
-    srcPath = srcPath || `${config.appPath}${sep}..${sep}src`;
+  compile(srcPath, outPath, ...options){
+    srcPath = srcPath || config.srcPath;
     outPath = outPath || config.appPath;
     if(isDir(srcPath)){
       let reloadInstance = this.getReloadInstance(outPath);

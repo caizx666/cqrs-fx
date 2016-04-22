@@ -10,7 +10,8 @@ export const isDir = file =>{
 export const log = msg =>{
   console.log(msg);
 };
-export const seq = path.seq;
+export const sep = path.sep;
+export const join = path.join;
 export const exists = file => {
   return fs.existsSync(file);
 };
