@@ -1,5 +1,5 @@
 import entity from './entity';
-import {idgenerator} from './generator';
+import uuid from 'node-uuid';
 import register from '../register';
 import {getType} from '../core';
 import err from '../err';
@@ -22,7 +22,7 @@ class aggregate {
   static get(name){
     let alias = register.domain[name];
     if (!alias) return null;
-    return getType(alias); 
+    return getType(alias);
   }
 
   get id( ){
@@ -123,7 +123,7 @@ class aggregate {
     }
     if (!event || !event.name)
       return;
-    event.id = idgenerator.generate();
+    event.id = uuid.v1();
     event.version = ++this._eventVersion;
     event.branch = DEFAULT_BRACH;
     event.timestamp = timestamp();

@@ -1,7 +1,7 @@
 import config from '../config';
 import err from '../err';
 import eventStorage from '../event/domain_event_storage';
-import {idgenerator} from '../generator';
+import uuid from 'node-uuid';
 
 export default class {
 	constructor() {
@@ -96,7 +96,7 @@ export default class {
 			});
 			this._snapshotMapping.set(key, snapshot);
 		} else {
-			dataObj.id = idgenerator.get();
+			dataObj.id = uuid.v1();
 			await this.snapshotStorage.insert(dataObj);
 			this._snapshotMapping.set(key, snapshot);
 		}
