@@ -1,9 +1,11 @@
 import redis from "redis";
-import {log} from '../utils';
+import {
+  log
+} from '../utils';
 import config from '../config';
 
-export default class{
-  constructor(){
+export default class {
+  constructor() {
     let redisConfig = config.get('redis');
     this._password = redisConfig.password;
     this._hkey = 'cqrs_snapshot';
@@ -13,42 +15,42 @@ export default class{
     });
   }
 
-  count(spec){
-    return new Promise(function(resolve, reject) {
+  count(spec) {
+    return new Promise(function (resolve, reject) {
       this._client.hkeys(this._hkey, function (err, replies) {
         if (err) reject(err);
-         resolve(replies.length);
+        resolve(replies.length);
       });
     });
   }
 
-// select first
-  first(spec){
+  // select first
+  first(spec) {
 
   }
 
-  update(dto, spec){
+  update(dto, spec) {
 
   }
 
-  inert(dto){
+  inert(dto) {
 
   }
 
-  commit(){
+  commit() {
     let _commit = function functionName() {
 
-    }
-    if (this._password){
-      this._client.auth(this._password, function(){
+    };
+    if (this._password) {
+      this._client.auth(this._password, function () {
 
       });
-    }else{
+    } else {
 
     }
   }
 
-  rollback(){
+  rollback() {
 
   }
 }
