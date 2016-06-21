@@ -13,15 +13,15 @@ export default class {
   dispatch(message){
     if (!isString(message.name) || !isString(message.type) ||
       (message.type != 'event' && message.type != 'command')){
-      log('消息无效')
+      log('消息无效');
       return;
     }
     let register = register[message.type+'handler'];
     if (!register){
-      log('消息'+message.type+'类型尚未支持')
+      log('消息'+message.type+'类型尚未支持');
       return;
     }
-    this._onDispatching()
+    this._onDispatching();
     let handlers = register[message.name] || [];
     handlers.forEach(type=>{
       var CLS = getType(type);

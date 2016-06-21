@@ -1,11 +1,11 @@
 export const register = {
-    eventhandler: {
-      // xxxevent: []
-    },
-    commandhandler: {
+  eventhandler: {
+    // xxxevent: []
+  },
+  commandhandler: {
 
-    },
-    domain:{
+  },
+  domain: {
 
-    }
-}
+  }
+};

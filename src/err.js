@@ -8,4 +8,4 @@ export default {
   argumentNull: '1200',
   configFailed: '12001',
   aggregateNotExists: '12002'
-}
+};

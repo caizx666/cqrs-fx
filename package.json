@@ -4,15 +4,14 @@
   "description": "cqrs framework",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test",
-    "demo": "node demo/app.js"
+    "test": "mocha test"
   },
   "keywords": [
     "cqrs",
     "saas-plat"
   ],
-  "repository": {
-    "type" : "git",
+  "repository": { 
+    "type" : "git", 
     "url" : "https://github.com/saas-plat/cqrs.git"
   },
   "author": "saas-plat.com",

@@ -1,15 +1,34 @@
-import config from './config';
-import {fxData, alias, getType} from './core';
-import register from './register';
-import {safeRequire, log, isDir, isFile, join, sep, exists, getDirs, getFiles, isString} from './utils';
+import path from 'path';
 
-export default class{
-  constructor(options){
-    config.init(options||{});
+import config from './config';
+import {
+  fxData,
+  alias,
+  getType
+} from './core';
+import register from './register';
+import {
+  safeRequire,
+  log,
+  isDir,
+  isFile,
+  seq,
+  exists,
+  getDirs,
+  getFiles,
+  isString,
+  isFunction
+} from './utils';
+import WatchCompile from './util/watch_complile';
+import AutoReload from './util/auto_reload';
+
+export default class {
+  constructor(options, loader) {
+    config.init(options || {});
     this._modules = [];
-    this._types = ['command','domain','event'];
+    this._loader = loader;
+    this._types = ['command', 'domain', 'event'];
     this._dirname = {
-      app: 'app',
       command: 'command',
       config: 'config',
       event: 'event',
@@ -17,131 +36,141 @@ export default class{
     };
   }
 
-  loadSubModule( name ){
-    if (!config.appPath) return;
-    let path = join(config.appPath, name);
-      if(isDir(path)){
-        var dirs = getDirs(path);
-        if (dirs.length<=0) return;  // 空模块
-        let isModule = false;
-        for(let name of dirs){
-          if (this._types.indexOf(name)>-1){
-            isModule = true;
-            break;
-          }
-        }
-        if (!isModule){
-          for(let dir of dirs){
-            this.loadSubModule(join(name, dir));
-          }
-        }else{
-          this._modules.push(name)
+  loadSubModule(name) {
+    let path = path.join(config.appPath, name);
+    if (isDir(path)) {
+      var dirs = getDirs(path);
+      if (dirs.length <= 0) return; // 空模块
+      let isModule = false;
+      for (let name of dirs) {
+        if (this._types.indexOf(name) > -1) {
+          isModule = true;
+          break;
         }
       }
+      if (!isModule) {
+        for (let dir of dirs) {
+          this.loadSubModule(path.join(name, dir));
+        }
+      } else {
+        this._modules.push(name);
+      }
+    }
   }
 
-  loadModule(){
+  loadModule() {
     this._modules = [];
     this.loadSubModule('');
   }
 
   // 加载cqrs
-  loadCQRS(){
-    for(let itemType of this._types){
+  loadCQRS() {
+    for (let itemType of this._types) {
       this._modules.forEach(module => {
-        let name =module.replace(/\\/g,'/');
+        let name = module.replace(/\\/g, '/');
         let moduleType = name + '/' + itemType;
         let filepath = `${config.appPath}${sep}${module}${sep}${this._dirname[itemType]}`;
         alias(moduleType, filepath);
-        if (itemtype == 'command' || itemtype == 'event')
-          this._registerHandler(name, itemType, moduletype);
-        if (itemtype == 'domain'  )
-          this._registerDomain(name, itemType, moduletype);
       });
+      // 支持加载扩展对象定义
+      this.loadExts({
+        itemtype,
+        modules: this._modules,
+        alias
+      });
+    }
+    // 注册处理器和domain对象
+    for (let itemType of this._types) {
+      if (itemtype == 'command' || itemtype == 'event')
+        this._registerHandler(name, itemType);
+      if (itemtype == 'domain')
+        this._registerDomain(name, itemType);
     }
   }
 
-  _registerDomain(name, moduleType){
-    let domain = register['domain'];
-    if (!domain) return;
-    fxData.alias.forEach(alias=>{
-      // 当前新加载的类型
-      if (!alias.startWith(moduleType))
-        return;
-      // 默认模块下的domain都是处理当前模块下的
-      let name = alias.substr(moduleType.length+1);
-      // 当前模块自动追加模块命名空间成fullname
-      let fullName = name.replace(/\//g, '_')+'_'+name;
-      domain[fullName] = alias;
-    });
+  loadExts(args) {
+    if (isFunction(this._loader)) {
+      this._loader(args);
+    }
   }
 
-  _registerHandler(name, itemtype, moduletype){
-    let handlers = register[itemtype+'handler'];
-      if (handlers != null){
-        handlerConfig = config.get(itemtype+'handler',
-           `${config.appPath}${sep}${module}${sep}${this._dirname['config']}`);
-        let configtypes = [];
-        for(let p in handlerConfig){
+  _registerDomain(name, itemType) {
+    let domain = register.domain;
+    if (!domain) return;
+    for (let alias in fxData.alias) {
+      if (alias.indexOf('/' + itemType + '/'))
+        domain[alias] = alias;
+    }
+  }
+
+  _registerHandler(name, itemtype) {
+    let handlers = register[itemtype + 'handler'];
+    if (handlers !== null) {
+      // 先注册配置文件中定义的handler，配置文件中可以配置其他模块的handler
+      this._modules.forEach(module => {
+        let handlerConfig = config.get(itemType + 'handler',
+          `${config.appPath}${sep}${module}${sep}${this._dirname.config}`);
+        for (let p in handlerConfig) {
           if (!isString(p)) continue;
-          let array = handlers[p]||[];
+          let array = handlers[p] || [];
           let items = handlerConfig[p];
-          for(let item of items){
-            configtypes.push(item);
-            if (array.indexOf(item)>-1)
+          for (let item of items) {
+            if (array.indexOf(item) > -1)
               continue;
+            // 如果handler文件不存在跳过
+            if (!fxData.alias[`${module}/${itemType}/${item}`])
+              continue;
+            // 注册
             array.push(item);
           }
           handlers[p] = array;
         }
-        fxData.alias.forEach(alias=>{
-          // 当前新加载的类型
-          if (!alias.startWith(moduleType))
-            return;
-          // 默认模块下的handler都是处理当前模块下的消息
-          let name = alias.substr(moduleType.length+1);
-          // 如果在配置文件里就是其他模块的消息
-          if (configtypes.indexOf(name)>-1)
-            return;
-          // 当前模块自动追加模块命名空间成fullname
-          let fullName = name.replace(/\//g, '_')+'_'+name;
-          let array = handlers[fullName]||[];
-          if (array.indexOf(alias)>-1)
-            return;
-          array.push(alias);
-          handlers[fullName] = array;
-        });
+      });
+      // 补充默认handler文件夹中的handler
+      for (let alias in fxData.alias) {
+        if (alias.indexOf('/' + itemType + '/') == -1)
+          continue;
+        let messageType = alias.trimRight('handler');
+        let array = handlers[messageType] || [];
+        if (array.indexOf(alias) > -1)
+          return;
+        // 要是已经在配置文件中注册，就不注册默认事件
+        
+        // 注册
+        array.push(alias);
+        handlers[messageType] = array;
       }
+    }
   }
 
-  checkEnv(){
-      if (!exists(config.appPath)){
-        throw `appPath ${config.appPath} not found.`;
-      }
+  checkEnv() {
+    if (!exists(config.appPath)) {
+      throw `appPath ${config.appPath} not found.`;
     }
+  }
 
-  autoReload(){
-      //it auto reload by watch compile
-      if(this.compileCallback){
-        return;
-      }
-      let instance = this.getReloadInstance();
-      instance.run();
+  autoReload() {
+    //it auto reload by watch compile
+    if (this.compileCallback) {
+      return;
     }
+    let instance = this.getReloadInstance();
+    instance.run();
+  }
 
-  getReloadInstance(srcPath){
-      srcPath = srcPath || config.appPath;
-      let instance = new AutoReload(srcPath, () => {
-        this.clearData();
-        this.load();
-      });
-      return instance;
-    }
+  getReloadInstance(srcPath) {
+    srcPath = srcPath || config.appPath;
+    let instance = new AutoReload(srcPath, () => {
+      this.clearData();
+      this.load();
+    });
+    return instance;
+  }
 
-  compile(srcPath, outPath, ...options){
-    srcPath = srcPath || config.srcPath;
+  compile(srcPath, outPath, options = {}) {
+    srcPath = srcPath || `${config.appPath}${sep}..${sep}src`;
     outPath = outPath || config.appPath;
-    if(isDir(srcPath)){
+    if (isDir(srcPath)) {
       let reloadInstance = this.getReloadInstance(outPath);
       this.compileCallback = changedFiles => {
         reloadInstance.clearFilesCache(changedFiles);
@@ -152,32 +181,31 @@ export default class{
     }
   }
 
-  clearData(){
-    if (this._modules){
+  clearData() {
+    if (this._modules) {
       fxData.alias = {};
       fxData.export = {};
     }
   }
 
-  load(){
+  load() {
     this.checkEnv();
     this.loadModule();
     this.loadCQRS();
-    this.loadApp();
   }
 
-  preload(){
+  preload() {
     let startTime = Date.now();
-    for(let name in fxData.alias){
+    for (let name in fxData.alias) {
       getType(fxData.alias[name]);
     }
     log('cqrs preload packages finished', 'PRELOAD', startTime);
   }
 
-  run(preload){
+  run(preload) {
     this.load();
     this.autoReload();
-    if (preload){
+    if (preload) {
       this.preload();
     }
   }

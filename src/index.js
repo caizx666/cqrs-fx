@@ -1,5 +1,4 @@
-'use strict';
-
+import bus from './bus';
 import commandhandler from './command/handler';
 import eventhandler from './event/handler';
 import aggregate from './aggregate';
@@ -9,9 +8,10 @@ import utils from './utils';
 
 export default {
   app,
+  bus,
   domain,
   aggregate,
-  command:{handler},
-  event:{handler},
+  'command':{commandhandler},
+  'event':{eventhandler},
   utils
 };

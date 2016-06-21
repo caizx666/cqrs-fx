@@ -1,15 +1,19 @@
 import entity from './entity';
 import uuid from 'node-uuid';
 import register from '../register';
-import {getType} from '../core';
+import {
+  getType
+} from '../core';
 import err from '../err';
-import {timestamp} from './utils';
+import {
+  timestamp
+} from './utils';
 
 const DEFAULT_BRACH = 0;
 const DEFAULT_VERSION = 0;
 
 class aggregate {
-  constructor(id){
+  constructor(id) {
     this._version = DEFAULT_VERSION;
     this._branch = DEFAULT_BRACH;
     this._uncommittedEvents = [];
@@ -19,46 +23,46 @@ class aggregate {
   }
 
   // 获取聚合根对象类型
-  static get(name){
+  static get(name) {
     let alias = register.domain[name];
     if (!alias) return null;
     return getType(alias);
   }
 
-  get id( ){
+  get id() {
     return this._id;
   }
 
-  set id(value){
+  set id(value) {
     this._id = value;
   }
 
-  get uncommittedEvents(){
+  get uncommittedEvents() {
     return this._uncommittedEvents;
   }
 
-  get version(){
+  get version() {
     return this._version + this._uncommittedEvents.length;
- }
+  }
 
-  get branch(){
+  get branch() {
     return this._branch;
   }
 
-  set buildFromHistory(...historicalEvents){
+  set buildFromHistory(...historicalEvents) {
     if (this._uncommittedEvents.Count() > 0)
       this._uncommittedEvents.Clear();
-    for(let de of historicalEvents)
+    for (let de of historicalEvents)
       this._handleEvent(de);
-    this._version = historicalEvents[historicalEvents.length-1].version;
+    this._version = historicalEvents[historicalEvents.length - 1].version;
     this._eventVersion = this._version;
   }
 
-  _getDomainEventHandlers(eventname){
-    if(this._domainEventHandlers[eventname])
+  _getDomainEventHandlers(eventname) {
+    if (this._domainEventHandlers[eventname])
       return this._domainEventHandlers[eventname];
     let handlers = [];
-    for(var p in this){
+    for (var p in this) {
       let handler = snapshot[p];
       if ((!p.endWith('Event') && !p.endWith('Handler')) || typeof handler !== 'function')
         continue;
@@ -68,42 +72,42 @@ class aggregate {
     return handlers;
   }
 
-  _handleEvent(event){
+  _handleEvent(event) {
     let handlers = this._getDomainEventHandlers(event.name);
-    for(var handler of handlers){
+    for (var handler of handlers) {
       handler(event.data);
     }
   }
 
-  buildFromSnapshot(snapshot){
+  buildFromSnapshot(snapshot) {
     this._branch = snapshot.branch;
     this._version = snapshot.version;
     this._id = snapshot.aggregateRootID;
     if (this.doBuildFromSnapshot)
       this.doBuildFromSnapshot(snapshot);
-    else{
-      for(var p in snapshot){
+    else {
+      for (var p in snapshot) {
         let item = snapshot[p];
         if (typeof item === 'function')
           continue;
         if (!this.hasOwnProperty(p))
           continue;
-        this[p]=item;
+        this[p] = item;
       }
     }
     this._uncommittedEvents.clear();
   }
 
-  createSnapshot(){
+  createSnapshot() {
     let snapshot = {};
-    if (this.doCreateSnapshot){
-      snapshot = this.doCreateSnapshot() ;
-    }else{
-      for(var p in this){
+    if (this.doCreateSnapshot) {
+      snapshot = this.doCreateSnapshot();
+    } else {
+      for (var p in this) {
         let item = this[p];
         if (typeof item === 'function')
           continue;
-        snapshot[p]=item;
+        snapshot[p] = item;
       }
     }
     snapshot = snapshot || {};
@@ -114,11 +118,14 @@ class aggregate {
     return snapshot;
   }
 
-  raise(name, data){
+  raise(name, data) {
     let event;
-    if (typeof name === 'string'){
-      event = {name , data};
-    }else{
+    if (typeof name === 'string') {
+      event = {
+        name,
+        data
+      };
+    } else {
       event = name;
     }
     if (!event || !event.name)
