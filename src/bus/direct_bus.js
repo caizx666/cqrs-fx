@@ -1,6 +1,3 @@
-'use strict';
-
-import bus from './bus';
 import repository from '../repository';
 
 export default class {

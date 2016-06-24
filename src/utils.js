@@ -1,5 +1,8 @@
 import path from 'path';
 import fs from 'fs';
+import nuuid from 'node-uuid';
+
+export const uuid = nuuid;
 
 export const isFile = file => {
   return fs.statSync(file).isFile();
@@ -10,7 +13,10 @@ export const isDir = file => {
 export const log = msg => {
   console.log(msg);
 };
-export const seq = path.seq;
+export const sep = path.sep;
+export const join = () => {
+  return path.join.apply(path, arguments);
+};
 export const exists = file => {
   return fs.existsSync(file);
 };

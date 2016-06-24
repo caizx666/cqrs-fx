@@ -50,7 +50,7 @@ export default class{
                   });
                 }
                 count--;
-                if (count == 0){
+                if (count === 0){
                   this._addList.clear();
                   connection.commit(function(err) {
                     connection.release();

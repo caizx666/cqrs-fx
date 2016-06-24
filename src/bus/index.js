@@ -2,36 +2,43 @@ import config from '../config';
 import mqbus from './mq_bus';
 import directbus from './direct_bus';
 import dispatcher from './message_dipatcher';
-import err from '../err'
+import err from '../err';
 
 const busConfig = config.get('bus');
 
-let commandDispatcher = (busConfig.commandDispatcher || busConfig.dispatcher) == 'message_dipatcher'? new dispatcher():
-  typeof (busConfig.commandDispatcher || busConfig.dispatcher) === 'function'? new (busConfig.commandDispatcher || busConfig.dispatcher) :
-  null;
+let commandDispatcherType = typeof (busConfig.commandDispatcher || busConfig.dispatcher) === 'function'?
+  busConfig.commandDispatcher || busConfig.dispatcher : null;
+let enventDispatcherType = typeof (busConfig.eventDispatcher || busConfig.dispatcher) === 'function'?
+  busConfig.eventDispatcher || busConfig.dispatcher : null;
 
-let eventDispatcher = (busConfig.eventDispatcher || busConfig.dispatcher) == 'message_dipatcher'? new dispatcher():
-    typeof (busConfig.eventDispatcher || busConfig.dispatcher) === 'function'? new (busConfig.eventDispatcher || busConfig.dispatcher) :
-    null;
+let commandBusType = typeof (busConfig.commandBus || busConfig.type) === 'function'?   (busConfig.commandBus || busConfig.type)('command',commandDispatcher): null;
+let eventBusType = typeof (busConfig.eventBus || busConfig.type) === 'function'?   (busConfig.eventBus || busConfig.type)('event',eventDispatcher) : null ;
 
-if (commandbus == null)
+let commandDispatcherConfig = (busConfig.commandDispatcher || busConfig.dispatcher) == 'message_dipatcher';
+let eventDispatcherConfig =(busConfig.eventDispatcher || busConfig.dispatcher) == 'message_dipatcher';
+
+var commandDispatcher = commandDispatcherConfig ? new dispatcher():
+  (commandDispatcherType? new commandDispatcherType(): null);
+
+var eventDispatcher = eventDispatcherConfig? new dispatcher():
+     enventDispatcherType? new enventDispatcherType(): null;
+
+if (commandbus === null)
       throw {code:err.configFailed, msg: '消息分发器未正确配置，可以在config/bus.js中指定'};
-if (eventbus == null)
+if (eventbus === null)
       throw {code:err.configFailed, msg: '事件总线未正确配置，可以在config/bus.js中指定'};
 
-let commandbus = (busConfig.commandBus || busConfig.type) === 'mq'? new mqbus() :
+var commandbus = (busConfig.commandBus || busConfig.type) === 'mq'? new mqbus() :
   (busConfig.commandBus || busConfig.type) === 'direct' ? new directbus() :
-  typeof (busConfig.commandBus || busConfig.type) === 'function'? new (busConfig.commandBus || busConfig.type)('command',commandDispatcher) :
-  null;
+  commandBusType? new commandBusType() : null;
 
-let eventbus = (busConfig.eventBus || busConfig.type) === 'mq'? new mqbus() :
+var eventbus = (busConfig.eventBus || busConfig.type) === 'mq'? new mqbus() :
   (busConfig.eventBus || busConfig.type) === 'direct' ? new directbus() :
-  typeof (busConfig.eventBus || busConfig.type) === 'function'? new (busConfig.eventBus || busConfig.type)('event',eventDispatcher) :
-  null;
+  eventBusType? new eventBusType() : null;
 
-if (commandbus == null)
+if (commandbus === null)
   throw {code:err.configFailed, msg: '命令总线未正确配置，可以在config/bus.js中指定'};
-if (eventbus == null)
+if (eventbus === null)
   throw {code:err.configFailed, msg: '事件总线未正确配置，可以在config/bus.js中指定'};
 
 
@@ -60,4 +67,4 @@ export default {
     }
     commandbus.commit();
   }
-}
+};

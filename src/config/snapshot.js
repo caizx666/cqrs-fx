@@ -7,4 +7,4 @@ export default {
   option: 'immediate',
   // 快照的保存周期，默认每100个事件保存一次快照
   numberOfEvents: 100,
-}
+};

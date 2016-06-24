@@ -12,7 +12,7 @@ import {
   log,
   isDir,
   isFile,
-  seq,
+  sep,
   exists,
   getDirs,
   getFiles,

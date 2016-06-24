@@ -1,10 +1,8 @@
-import entity from './entity';
-import uuid from 'node-uuid';
-import register from '../register';
+import register from './register';
 import {
   getType
-} from '../core';
-import err from '../err';
+} from './core';
+import err from './err';
 import {
   timestamp
 } from './utils';

@@ -4,4 +4,4 @@ export default {
   // commandBus: 'direct',
   // eventBus: 'direct',
   dispatcher: 'message_dipatcher'
-}
+};
