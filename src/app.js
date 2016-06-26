@@ -37,9 +37,9 @@ export default class {
   }
 
   loadSubModule(name) {
-    let path = path.join(config.appPath, name);
-    if (isDir(path)) {
-      var dirs = getDirs(path);
+    let dir = path.join(config.appPath, name);
+    if (isDir(dir)) {
+      var dirs = getDirs(dir);
       if (dirs.length <= 0) return; // 空模块
       let isModule = false;
       for (let name of dirs) {
@@ -74,17 +74,20 @@ export default class {
       });
       // 支持加载扩展对象定义
       this.loadExts({
-        itemtype,
+        itemType,
         modules: this._modules,
         alias
       });
     }
     // 注册处理器和domain对象
     for (let itemType of this._types) {
-      if (itemtype == 'command' || itemtype == 'event')
-        this._registerHandler(name, itemType);
-      if (itemtype == 'domain')
-        this._registerDomain(name, itemType);
+      this._modules.forEach(module => {
+        let name = module.replace(/\\/g, '/');
+        if (itemType == 'command' || itemType == 'event')
+          this._registerHandler(name, itemType);
+        if (itemType == 'domain')
+          this._registerDomain(name, itemType);
+      });
     }
   }
 
@@ -103,8 +106,8 @@ export default class {
     }
   }
 
-  _registerHandler(name, itemtype) {
-    let handlers = register[itemtype + 'handler'];
+  _registerHandler(name, itemType) {
+    let handlers = register[itemType + 'handler'];
     if (handlers !== null) {
       // 先注册配置文件中定义的handler，配置文件中可以配置其他模块的handler
       this._modules.forEach(module => {
@@ -145,7 +148,7 @@ export default class {
 
   checkEnv() {
     if (!exists(config.appPath)) {
-      throw `appPath ${config.appPath} not found.`;
+      throw Error(`appPath "${config.appPath || ''}" not found.`);
     }
   }
 

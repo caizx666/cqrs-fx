@@ -13,6 +13,7 @@ export default new class {
   init(options) {
     options = options || {};
     this.configPath = options.configPath;
+    this.appPath = options.appPath;
     this.initConfig = Object.assign({}, options);
   }
 

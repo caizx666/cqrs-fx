@@ -10,7 +10,7 @@ import {
 const DEFAULT_BRACH = 0;
 const DEFAULT_VERSION = 0;
 
-class aggregate {
+export default class aggregate {
   constructor(id) {
     this._version = DEFAULT_VERSION;
     this._branch = DEFAULT_BRACH;
@@ -47,7 +47,7 @@ class aggregate {
     return this._branch;
   }
 
-  set buildFromHistory(...historicalEvents) {
+  buildFromHistory(...historicalEvents) {
     if (this._uncommittedEvents.Count() > 0)
       this._uncommittedEvents.Clear();
     for (let de of historicalEvents)
@@ -136,5 +136,3 @@ class aggregate {
     this._uncommittedEvents().push(event);
   }
 }
-
-export default aggregate;

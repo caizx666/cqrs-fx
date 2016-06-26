@@ -8,7 +8,7 @@ export const isFile = file => {
   return fs.statSync(file).isFile();
 };
 export const isDir = file => {
-  return fs.statSync(file).isDir();
+  return fs.statSync(file).isDirectory();
 };
 export const log = msg => {
   console.log(msg);
@@ -25,7 +25,7 @@ export function getDirs(file) {
   let files = fs.readdirSync(file);
   let dirs = [];
   for (var fi of files) {
-    if (fs.statSync(fi).isDirectory())
+    if (fs.statSync(path.join(file,fi)).isDirectory())
       dirs.push(fi);
   }
   return dirs;
@@ -35,7 +35,7 @@ export function getFiles(file) {
   let files = fs.readdirSync(file);
   let dirs = [];
   for (var fi of files) {
-    if (fs.statSync(fi).isFile())
+    if (fs.statSync(path.join(file,fi)).isFile())
       dirs.push(fi);
   }
   return dirs;
