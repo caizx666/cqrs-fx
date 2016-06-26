@@ -1,7 +1,7 @@
 import config from '../config';
 import mqbus from './mq_bus';
 import directbus from './direct_bus';
-import dispatcher from './message_dipatcher';
+import dispatcher from './message_dispatcher';
 import err from '../err';
 
 const busConfig = config.get('bus');

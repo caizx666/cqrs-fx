@@ -6,10 +6,10 @@ export default class {
     let eventConfig = config.get('event');
     let eventStorage = require(`./${eventConfig.storage}_storage`);
     if (!eventStorage)
-      throw {
-        code: err.configFailed,
-        msg: '事件存储服务未正确配置，可以在config/event.js中指定'
-      };
+      throw Error(
+         err.configFailed,
+         '事件存储服务未正确配置，可以在config/event.js中指定'
+      );
 
     this.eventStorage = eventStorage;
   }

@@ -1,4 +1,4 @@
 export default {
-  storage: 'mysql',
+  storage: 'domain_event',
   table: 'events'
 };

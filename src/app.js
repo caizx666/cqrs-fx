@@ -19,7 +19,7 @@ import {
   isString,
   isFunction
 } from './utils';
-import WatchCompile from './util/watch_complile';
+import WatchCompile from './util/watch_compile';
 import AutoReload from './util/auto_reload';
 
 export default class {
@@ -135,7 +135,7 @@ export default class {
         if (array.indexOf(alias) > -1)
           return;
         // 要是已经在配置文件中注册，就不注册默认事件
-        
+
         // 注册
         array.push(alias);
         handlers[messageType] = array;

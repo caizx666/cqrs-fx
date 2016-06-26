@@ -3,15 +3,13 @@ import commandhandler from './command/handler';
 import eventhandler from './event/handler';
 import aggregate from './aggregate';
 import app from './app';
-import domain from './domain';
 import utils from './utils';
 
-export default {
+export {
   app,
   bus,
-  domain,
   aggregate,
-  'command':{commandhandler},
-  'event':{eventhandler},
+  commandhandler,
+  eventhandler,
   utils
 };

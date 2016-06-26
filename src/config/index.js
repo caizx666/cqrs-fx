@@ -5,11 +5,14 @@ import {
 } from '../utils';
 
 export default new class {
-  constructor(options) {
-    options = options || {};
+  constructor() {
     this.rootConfig = __dirname;
-    this.configPath = options.configPath;
     this.configCache = {};
+  }
+
+  init(options) {
+    options = options || {};
+    this.configPath = options.configPath;
     this.initConfig = Object.assign({}, options);
   }
 
