@@ -78,17 +78,19 @@ export default class {
         modules: this._modules,
         alias
       });
-    }
-    // 注册处理器和domain对象
-    for (let itemType of this._types) {
-      this._modules.forEach(module => {
-        let name = module.replace(/\\/g, '/');
-        if (itemType == 'command' || itemType == 'event')
-          this._registerHandler(name, itemType);
-        if (itemType == 'domain')
-          this._registerDomain(name, itemType);
-      });
-    }
+    } 
+  }
+
+  alias(type, path){
+  	// 注册类型
+  	alias(type, path);
+  }
+
+  register(){
+  	// 注册处理器和domain对象 
+    this._registerHandler('command'); 
+    this._registerHandler('event'); 
+    this._registerDomain('domain');
   }
 
   loadExts(args) {
@@ -195,6 +197,7 @@ export default class {
     this.checkEnv();
     this.loadModule();
     this.loadCQRS();
+    this.register();
   }
 
   preload() {
