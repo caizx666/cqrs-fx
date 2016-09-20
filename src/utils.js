@@ -32,11 +32,13 @@ export function getDirs(file) {
 }
 
 export function getFiles(file) {
-  let files = fs.readdirSync(file);
   let dirs = [];
-  for (var fi of files) {
-    if (fs.statSync(path.join(file,fi)).isFile())
-      dirs.push(fi);
+  if (fs.existsSync(file)){
+    let files = fs.readdirSync(file);
+    for (var fi of files) {
+      if (fs.statSync(path.join(file,fi)).isFile())
+        dirs.push(fi);
+    }
   }
   return dirs;
 }
@@ -82,19 +84,19 @@ export function isArray(value) {
 }
 
 export function isFunction(func) {
-  return typeof func == 'function';
+  return typeof func === 'function';
 }
 
 export function isString(txt) {
-  return typeof txt !== 'string';
+  return typeof txt === 'string';
 }
 
 export function isNumber(txt) {
-  return typeof txt !== 'number';
+  return typeof txt === 'number';
 }
 
 export function isObject(txt) {
-  return typeof txt !== 'object';
+  return typeof txt === 'object';
 }
 
 let parseValue = function (exprArray, name, value, opt) {
@@ -120,4 +122,17 @@ export function expr(sepc) {
     parseValue(exprArray, name, value, '=');
   }
   return string.join(exprArray, ' and ');
+}
+
+export function merge(...args){
+  let obj = {};
+  for(let item of args){
+    if (!item) continue;
+    for(let p of item){
+      if (item.hasOwnProperty(p) && item[p]){
+        obj[p] = (obj[p] || []).concat(item[p]);
+      }
+    }
+  }
+  return obj;
 }

@@ -4,9 +4,9 @@ import config from './config';
 import {
   fxData,
   alias,
-  getType
+  require
 } from './core';
-import register from './register';
+import {register} from './register';
 import {
   safeRequire,
   log,
@@ -17,7 +17,8 @@ import {
   getDirs,
   getFiles,
   isString,
-  isFunction
+  isFunction,
+  merge
 } from './utils';
 import WatchCompile from './util/watch_compile';
 import AutoReload from './util/auto_reload';
@@ -27,7 +28,7 @@ export default class {
     config.init(options || {});
     this._modules = [];
     this._loader = loader;
-    this._types = ['command', 'domain', 'event'];
+    this._types = ['command', 'domain', 'event', 'config'];
     this._dirname = {
       command: 'command',
       config: 'config',
@@ -78,73 +79,12 @@ export default class {
         modules: this._modules,
         alias
       });
-    } 
-  }
-
-  alias(type, path){
-  	// 注册类型
-  	alias(type, path);
-  }
-
-  register(){
-  	// 注册处理器和domain对象 
-    this._registerHandler('command'); 
-    this._registerHandler('event'); 
-    this._registerDomain('domain');
+    }
   }
 
   loadExts(args) {
     if (isFunction(this._loader)) {
       this._loader(args);
-    }
-  }
-
-  _registerDomain(name, itemType) {
-    let domain = register.domain;
-    if (!domain) return;
-    for (let alias in fxData.alias) {
-      if (alias.indexOf('/' + itemType + '/'))
-        domain[alias] = alias;
-    }
-  }
-
-  _registerHandler(name, itemType) {
-    let handlers = register[itemType + 'handler'];
-    if (handlers !== null) {
-      // 先注册配置文件中定义的handler，配置文件中可以配置其他模块的handler
-      this._modules.forEach(module => {
-        let handlerConfig = config.get(itemType + 'handler',
-          `${config.appPath}${sep}${module}${sep}${this._dirname.config}`);
-        for (let p in handlerConfig) {
-          if (!isString(p)) continue;
-          let array = handlers[p] || [];
-          let items = handlerConfig[p];
-          for (let item of items) {
-            if (array.indexOf(item) > -1)
-              continue;
-            // 如果handler文件不存在跳过
-            if (!fxData.alias[`${module}/${itemType}/${item}`])
-              continue;
-            // 注册
-            array.push(item);
-          }
-          handlers[p] = array;
-        }
-      });
-      // 补充默认handler文件夹中的handler
-      for (let alias in fxData.alias) {
-        if (alias.indexOf('/' + itemType + '/') == -1)
-          continue;
-        let messageType = alias.trimRight('handler');
-        let array = handlers[messageType] || [];
-        if (array.indexOf(alias) > -1)
-          return;
-        // 要是已经在配置文件中注册，就不注册默认事件
-
-        // 注册
-        array.push(alias);
-        handlers[messageType] = array;
-      }
     }
   }
 
@@ -197,13 +137,13 @@ export default class {
     this.checkEnv();
     this.loadModule();
     this.loadCQRS();
-    this.register();
+    register();
   }
 
   preload() {
     let startTime = Date.now();
     for (let name in fxData.alias) {
-      getType(fxData.alias[name]);
+      require(name);
     }
     log('cqrs preload packages finished', 'PRELOAD', startTime);
   }

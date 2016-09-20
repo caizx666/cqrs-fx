@@ -3,7 +3,9 @@ import {
   isArray,
   isString,
   isFunction,
-  isObject
+  isObject,
+  getFiles,
+  sep
 } from './utils';
 
 export const fxData = {
@@ -49,7 +51,7 @@ let _loadRequire = (name, filepath) => {
   return obj;
 };
 
-export function getType(name, flag) {
+export function require(name, flag) {
   if (!isString(name)) {
     return name;
   }
