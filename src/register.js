@@ -1,7 +1,7 @@
 import {
   fxData,
   alias,
-  require
+  _require
 } from './core';
 
 export const registry = {
@@ -40,7 +40,7 @@ function  _registerHandler(itemType) {
         if (alias.indexOf('/config/'+itemType+'handler') == -1)
           continue;
         let handlerConfig = config.get(itemType + 'handler');
-        handlerConfig = merge(handlerConfig, require(alias));
+        handlerConfig = merge(handlerConfig, _require(alias));
         for (let p in handlerConfig) {
             if (!isString(p)) continue;
             let array = handlers[p] || [];

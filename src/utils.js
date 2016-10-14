@@ -14,6 +14,7 @@ export const log = msg => {
   console.log(msg);
 };
 export const sep = path.sep;
+export const normalize = path.normalize;
 export const join = () => {
   return path.join.apply(path, arguments);
 };

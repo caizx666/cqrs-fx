@@ -1,6 +1,6 @@
 import register from './register';
 import {
-  getType
+  _require
 } from './core';
 import err from './err';
 import {
@@ -24,7 +24,7 @@ export default class aggregate {
   static get(name) {
     let alias = register.domain[name];
     if (!alias) return null;
-    return getType(alias);
+    return _require(alias);
   }
 
   get id() {

@@ -5,7 +5,8 @@ import {
   isFunction,
   isObject,
   getFiles,
-  sep
+  sep,
+  normalize
 } from './utils';
 
 export const fxData = {
@@ -51,7 +52,7 @@ let _loadRequire = (name, filepath) => {
   return obj;
 };
 
-export function require(name, flag) {
+export function _require(name, flag) {
   if (!isString(name)) {
     return name;
   }
@@ -77,7 +78,7 @@ export function require(name, flag) {
   }
   // 默认从文件加载
   if (isString(filepath)) {
-    return _loadRequire(name, path.normalize(filepath));
+    return _loadRequire(name, normalize(filepath));
   }
   // only check in alias
   if (flag) {

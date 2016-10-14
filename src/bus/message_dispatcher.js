@@ -1,5 +1,5 @@
 import {log,isFunction,isString} from '../utils';
-import {getType} from '../core';
+import {_require} from '../core';
 import register from '../register';
 
 export default class {
@@ -24,7 +24,7 @@ export default class {
     this._onDispatching();
     let handlers = register[message.name] || [];
     handlers.forEach(type=>{
-      var CLS = getType(type);
+      var CLS = _require(type);
       if (!CLS || !isFunction(CLS)) return;
       var handler = new CLS();
       if (!handler || !isFunction(handler.run)) return;

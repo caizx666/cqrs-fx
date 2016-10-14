@@ -4,7 +4,7 @@ import config from './config';
 import {
   fxData,
   alias,
-  require
+  _require
 } from './core';
 import {register} from './register';
 import {
@@ -143,7 +143,7 @@ export default class {
   preload() {
     let startTime = Date.now();
     for (let name in fxData.alias) {
-      require(name);
+      _require(name);
     }
     log('cqrs preload packages finished', 'PRELOAD', startTime);
   }
