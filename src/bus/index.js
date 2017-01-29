@@ -29,11 +29,11 @@ if (eventbus === null)
       throw {code:err.configFailed, msg: '事件总线未正确配置，可以在config/bus.js中指定'};
 
 var commandbus = (busConfig.commandBus || busConfig.type) === 'mq'? new mqbus() :
-  (busConfig.commandBus || busConfig.type) === 'direct' ? new directbus() :
+  (busConfig.commandBus || busConfig.type) === 'direct' ? new directbus('command',commandDispatcher) :
   commandBusType? new commandBusType() : null;
 
 var eventbus = (busConfig.eventBus || busConfig.type) === 'mq'? new mqbus() :
-  (busConfig.eventBus || busConfig.type) === 'direct' ? new directbus() :
+  (busConfig.eventBus || busConfig.type) === 'direct' ? new directbus('event',eventDispatcher) :
   eventBusType? new eventBusType() : null;
 
 if (commandbus === null)
