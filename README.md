@@ -2,4 +2,4 @@
 
 安装：
 
-npm install saas-plat/cqrs --save
+npm install cqrs-fx --save
