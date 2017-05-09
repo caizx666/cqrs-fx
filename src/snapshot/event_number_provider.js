@@ -1,7 +1,7 @@
 import config from '../config';
 import err from '../err';
 import eventStorage from '../event/domain_event_storage';
-import uuid from 'node-uuid';
+import uuid from 'uuid';
 
 export default class {
   constructor() {

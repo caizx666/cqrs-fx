@@ -34,6 +34,14 @@ export function getDispatcher(type) {
   return instance[type + 'Dispatcher'];
 }
 
+export function getEventDispatcher(){
+  return getDispatcher('event');
+}
+
+export function getCommandDispatcher(){
+  return getDispatcher('command');
+}
+
 export function getBus(type) {
   assert(type === 'command' || type === 'event');
 if (!instance[type + 'Bus']) {
@@ -43,8 +51,8 @@ if (!instance[type + 'Bus']) {
     (busConfig[type + 'Bus'] || busConfig.type) : null;
 
   var bus = (busConfig[type + 'Bus'] || busConfig.type) === 'mq' ? new mqbus() :
-    (busConfig[type + 'Bus'] || busConfig.type) === 'direct' ? new directbus('command', getDispatcher(type)) :
-    busType ? new busType('command', getDispatcher(type)) : null;
+    (busConfig[type + 'Bus'] || busConfig.type) === 'direct' ? new directbus(type, getDispatcher(type)) :
+    busType ? new busType(type, getDispatcher(type)) : null;
 
   if (bus === null)
     throw {
@@ -56,6 +64,14 @@ if (!instance[type + 'Bus']) {
   }
 
   return instance[type + 'Bus'];
+}
+
+export function getEventBus(){
+  return getBus('event');
+}
+
+export function getCommandBus(){
+  return getBus('command');
 }
 
 export function publish(type, ...messages) {
@@ -74,4 +90,12 @@ export function publish(type, ...messages) {
   const bus = getBus(type);
   bus.publish(...msgs);
   bus.commit();
+}
+
+export function publishEvent(...messages){
+  publish('event',...messages);
+}
+
+export function publishCommand(...messages){
+  publish('command',...messages);
 }

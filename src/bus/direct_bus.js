@@ -1,4 +1,4 @@
-import repository from '../repository';
+import * as repository from '../repository';
 
 export default class {
   constructor(type, dispatcher){
@@ -21,11 +21,11 @@ export default class {
     this.messageQueue.forEach(msg=>{
       this.dispatcher.dispatch({type, name:msg.name, data:msg.data});
     });
-    repository.commit();
+    repository.getRepository().commit();
     this.messageQueue.clear();
   }
 
   rollback(){
-    repository.rollback();
+    repository.getRepository().rollback();
   }
 }

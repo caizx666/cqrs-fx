@@ -1,18 +1,11 @@
-import eventSourced from './event_sourced_repository';
-import {
-  provider as snapshotProvider
-} from '../snapshot';
+import * as snapshot from '../snapshot';
 import aggregate from '../aggregate';
-import {
-  storage as domainEventStorage
-} from '../event';
+import * as event from '../event';
 import {
   isFunction,
   isString
 } from '../utils';
-import {
-  eventbus
-} from '../bus';
+import * as bus from '../bus';
 
 export default class {
   constructor() {
@@ -30,15 +23,16 @@ export default class {
     if (!name || !id || !isString(name) || !isString(id)) return null;
     let aggregateRoot = this.createAggregate(name, id, props);
     if (!aggregateRoot) return null;
+    const snapshotProvider = snapshot.getProvider();
     if (snapshotProvider && await snapshotProvider.hasSnapshot(name, id)) {
       let snapshot = await snapshotProvider.getSnapshot(name, id);
       aggregateRoot.buildFromSnapshot(snapshot);
-      var eventsAfterSnapshot = await domainEventStorage.loadEvents(name, id, snapshot.Version);
+      var eventsAfterSnapshot = await event.getStorage().loadEvents(name, id, snapshot.Version);
       if (eventsAfterSnapshot && eventsAfterSnapshot.length > 0)
         aggregateRoot.buildFromHistory(eventsAfterSnapshot);
     } else {
       aggregateRoot.id = id;
-      let evnts = await domainEventStorage.loadEvents(name, id);
+      let evnts = await event.getStorage().loadEvents(name, id);
       if (evnts != null && evnts.Count() > 0)
         aggregateRoot.buildFromHistory(evnts);
       else
@@ -57,6 +51,7 @@ export default class {
   }
 
   async commit() {
+    const snapshotProvider = snapshot.getProvider();
     for (let aggregateRoot of this._saveHash) {
       if (snapshotProvider && snapshotProvider.option == 'immediate') {
         if (await snapshotProvider.canCreateOrUpdateSnapshot(aggregateRoot)) {
@@ -65,20 +60,21 @@ export default class {
       }
       let events = aggregateRoot.uncommittedEvents;
       for (let evt of events) {
-        await domainEventStorage.saveEvent(evt);
-        await eventbus.publish(evt);
+        await event.getStorage().saveEvent(evt);
+        await bus.getEventBus().publish(evt);
       }
     }
     // todo 这里需要事务
-    await domainEventStorage.commit();
-    await eventbus.commit();
+    await event.getStorage().commit();
+    await bus.getEventBus().commit();
     if (snapshotProvider && snapshotProvider.option == 'immediate') {
       await snapshotProvider.commit();
     }
   }
 
   async rollback() {
-    await domainEventStorage.Rollback();
+    await event.getStorage().Rollback();
+    const snapshotProvider = snapshot.getProvider();
     if (snapshotProvider && snapshotProvider.option == 'immediate') {
       await snapshotProvider.Rollback();
     }

@@ -5,7 +5,7 @@ import i18n from '../i18n';
 
 let eventStorage;
 
-export function getEventStorage() {
+export function getStorage() {
   const evtConfig = config.get('event');
 
   if (eventStorage) {
