@@ -1,1 +1,0 @@
-{"version":3,"sources":["../../src/config/eventhandler.js"],"names":[],"mappings":";;;;;kBAAe;AACb;AADa,C","file":"eventhandler.js","sourcesContent":["export default {\r\n  // 'create_xxx_xxx':['xxx1','xxx2']\r\n};\r\n"]}

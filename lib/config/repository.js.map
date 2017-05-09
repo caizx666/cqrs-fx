@@ -1,1 +1,0 @@
-{"version":3,"sources":["../../src/config/repository.js"],"names":["type"],"mappings":";;;;;kBAAe;AACbA,QAAM;AADO,C","file":"repository.js","sourcesContent":["export default {\r\n  type: 'event_sourced'\r\n};\r\n"]}

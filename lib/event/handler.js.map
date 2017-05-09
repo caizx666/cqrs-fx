@@ -1,1 +1,0 @@
-{"version":3,"sources":["../../src/event/handler.js"],"names":["event"],"mappings":";;;;;;;;;;;;;;;;;AAEE,oBAAa;AAAA;AAEZ;;;;wBAEGA,K,EAAM,CAET","file":"handler.js","sourcesContent":["\r\nexport default class  {\r\n  constructor(){\r\n    \r\n  }\r\n\r\n  run(event){\r\n\r\n  }\r\n}\r\n"]}

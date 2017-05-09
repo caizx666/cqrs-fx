@@ -1,1 +1,0 @@
-{"version":3,"sources":["../../src/config/commandhandler.js"],"names":[],"mappings":";;;;;kBAAe;AACb;AADa,C","file":"commandhandler.js","sourcesContent":["export default {\r\n  // 'create_xxx_xxx':['xxx1','xxx2']\r\n};\r\n"]}
