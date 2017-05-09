@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../src/config/redis.js"],"names":["host","port","password","timeout"],"mappings":";;;;;kBAAe;AACbA,QAAM,WADO;AAEbC,QAAM,IAFO;AAGbC,YAAU,EAHG;AAIbC,WAAS;AAJI,C","file":"redis.js","sourcesContent":["export default {\r\n  host: \"127.0.0.1\",\r\n  port: 6379,\r\n  password: \"\",\r\n  timeout: 0 \r\n};\r\n"]}

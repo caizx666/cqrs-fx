@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../src/config/bus.js"],"names":["type","dispatcher"],"mappings":";;;;;kBAAe;AACb;AACAA,QAAM,QAFO;AAGb;AACA;AACAC,cAAY;AALC,C","file":"bus.js","sourcesContent":["export default {\r\n  // 默认值\r\n  type: 'direct',\r\n  // commandBus: 'direct',\r\n  // eventBus: 'direct',\r\n  dispatcher: 'message_dipatcher'\r\n};\r\n"]}

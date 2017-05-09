@@ -1,8 +1,8 @@
-import bus from './bus';
+import * as bus from './bus';
 import commandhandler from './command/handler';
 import eventhandler from './event/handler';
 import aggregate from './aggregate';
-import repository from './repository';
+import * as repository from './repository';
 import app from './app';
 
 export default {

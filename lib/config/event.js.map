@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../src/config/event.js"],"names":["storage","table"],"mappings":";;;;;kBAAe;AACbA,WAAS,cADI;AAEbC,SAAO;AAFM,C","file":"event.js","sourcesContent":["export default {\r\n  storage: 'domain_event',\r\n  table: 'events'\r\n};\r\n"]}

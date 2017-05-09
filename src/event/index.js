@@ -1,18 +1,27 @@
 import DomainEventStorage from './domain_event_storage';
 import config from '../config';
 import err from '../err';
+import i18n from '../i18n';
 
-const evtConfig = config.get('event');
+let eventStorage;
 
-let StorageType = typeof evtConfig.storage === 'function' ? evtConfig.storage : 'domain_event';
+export function getEventStorage() {
+  const evtConfig = config.get('event');
 
-let storage = evtConfig.storage == 'domain_event' ? new DomainEventStorage() : StorageType ? StorageType() : null;
-if (!storage)
-  throw Error(
-    err.configFailed,
-    '事件仓库未正确配置，可以在config/event.js中指定'
-  );
+  if (eventStorage) {
+    return eventStorage;
+  }
 
-export default {
-  storage
-};
+  let StorageType = typeof evtConfig.storage === 'function' ? evtConfig.storage : 'domain_event';
+
+  let storage = evtConfig.storage == 'domain_event' ? new DomainEventStorage() : StorageType ? StorageType() : null;
+  if (!storage)
+    throw Error(
+      err.configFailed,
+      i18n.t('事件仓库未正确配置，可以在config/event.js中指定')
+    );
+
+  eventStorage = storage;
+
+  return storage;
+}

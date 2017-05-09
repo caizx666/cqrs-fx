@@ -1,6 +1,6 @@
 import path from 'path';
 import fs from 'fs';
-import nuuid from 'node-uuid';
+import nuuid from 'uuid';
 
 export const uuid = nuuid;
 
