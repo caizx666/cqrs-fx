@@ -1,5 +1,6 @@
 import config from '../config';
 import err from '../err';
+import i18n from '../i18n';
 
 export default class {
   constructor() {
@@ -7,8 +8,8 @@ export default class {
     let eventStorage = require(`./${eventConfig.storage}_storage`);
     if (!eventStorage)
       throw Error(
-         err.configFailed,
-         '事件存储服务未正确配置，可以在config/event.js中指定'
+        err.configFailed,
+        i18n.t('事件存储服务未正确配置，可以在config/event.js中指定')
       );
 
     this.eventStorage = eventStorage;
@@ -29,14 +30,16 @@ export default class {
     });
     let events = [];
     results.forEach(s => {
-      events.push(Object.assgin(JSON.parse(s.data), {
+      events.push({
+        data: JSON.parse(s.data),
+        data: s.data,
         eventType: s.name,
         eventid: s.event_id,
         sourceid: s.source_id,
         branch: s.branch,
         version: s.version,
         timestamp: s.timestamp
-      }));
+      });
     });
     return events;
   }
@@ -47,7 +50,7 @@ export default class {
       eventType: event.name,
       eventid: event.id,
       sourceid: event.sourceid,
-      data: JSON.stringify(),
+      data: JSON.stringify(event.data),
       timestamp: event.timestamp,
       branch: event.branch,
       version: event.version

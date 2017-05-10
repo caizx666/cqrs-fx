@@ -4,11 +4,9 @@ import {
   exists
 } from '../utils';
 
-export default new class {
-  constructor() {
-    this.rootConfig = __dirname;
-    this.configCache = {};
-  }
+ class config {
+  rootConfig = __dirname;
+  configCache = {};
 
   init(options) {
     options = options || {};
@@ -48,4 +46,6 @@ export default new class {
     this.configCache[name] = json;
     return json;
   }
-}();
+};
+
+export default new config();

@@ -10,7 +10,7 @@ import {
 const DEFAULT_BRACH = 0;
 const DEFAULT_VERSION = 0;
 
-export default class aggregate {
+export default class Aggregate {
   constructor(id) {
     this._version = DEFAULT_VERSION;
     this._branch = DEFAULT_BRACH;
@@ -21,8 +21,9 @@ export default class aggregate {
   }
 
   // 获取聚合根对象类型
-  static get(name) {
-    let alias = register.domain[name];
+  static get(name, module) {
+    if (!module) return null;
+    let alias = register.domain[`${module}/domain/${name}`];
     if (!alias) return null;
     return _require(alias);
   }
@@ -116,7 +117,7 @@ export default class aggregate {
     return snapshot;
   }
 
-  raise(name, data) {
+  raiseEvent(name, data) {
     let event;
     if (typeof name === 'string') {
       event = {

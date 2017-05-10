@@ -4,7 +4,7 @@ import {
 } from '../utils';
 import mysql from '../storage/mysql';
 
-export default class {
+export default class MysqlStorage{
   constructor() {
     this._tableName = config.get('snapshot').table;
     this._actionList = [];

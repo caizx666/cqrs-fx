@@ -6,7 +6,9 @@ import {
   alias,
   _require
 } from './core';
-import {register} from './register';
+import {
+  register
+} from './register';
 import {
   safeRequire,
   log,
@@ -22,19 +24,25 @@ import {
 } from './utils';
 import WatchCompile from './util/watch_compile';
 import AutoReload from './util/auto_reload';
+import i18n from './i18n';
+import * as bus from './bus';
 
-export default class {
-  constructor(options, loader) {
+export default class App {
+  _modules = []
+  _types = ['command', 'domain', 'event', 'config']
+  _dirname = {
+    command: 'command',
+    config: 'config',
+    event: 'event',
+    domain: 'domain',
+  }
+
+  constructor(options) {
     config.init(options || {});
-    this._modules = [];
-    this._loader = loader;
-    this._types = ['command', 'domain', 'event', 'config'];
-    this._dirname = {
-      command: 'command',
-      config: 'config',
-      event: 'event',
-      domain: 'domain',
-    };
+    if (!config.appPath || typeof config.appPath !== 'string') {
+      throw new Error(i18n.t('appPath无效无法加载CRQS应用'));
+    }
+
   }
 
   loadSubModule(name) {
@@ -43,16 +51,18 @@ export default class {
       var dirs = getDirs(dir);
       if (dirs.length <= 0) return; // 空模块
       let isModule = false;
-      for (let name of dirs) {
-        if (this._types.indexOf(name) > -1) {
+      for (let subdir of dirs) {
+        if (this._types.indexOf(subdir) > -1) {
           isModule = true;
           break;
         }
       }
       if (!isModule) {
-        for (let dir of dirs) {
-          this.loadSubModule(path.join(name, dir));
+        for (let subdir of dirs) {
+          this.loadSubModule(path.join(name, subdir));
         }
+      } else if (name === '') {
+        throw new Error(i18n.t('appPath级别错误，需要设置到当前模块文件夹的上一级'));
       } else {
         this._modules.push(name);
       }
@@ -73,18 +83,6 @@ export default class {
         let filepath = `${config.appPath}${sep}${module}${sep}${this._dirname[itemType]}`;
         alias(moduleType, filepath);
       });
-      // 支持加载扩展对象定义
-      this.loadExts({
-        itemType,
-        modules: this._modules,
-        alias
-      });
-    }
-  }
-
-  loadExts(args) {
-    if (isFunction(this._loader)) {
-      this._loader(args);
     }
   }
 
@@ -149,10 +147,16 @@ export default class {
   }
 
   run(preload) {
+    this.clearData();
     this.load();
     this.autoReload();
     if (preload) {
       this.preload();
     }
   }
+
+  publishCommand(...messages) {
+    bus.publishCommand(...messages);
+  }
+
 }

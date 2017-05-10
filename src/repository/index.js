@@ -9,14 +9,14 @@ export function getRepository() {
     return repository;
   }
 
-  repository = config.get('repository').type ?
-    require(`./${config.get('repository').type}_repository`) : null;
+  const Repository = config.get('repository').type ?
+    require(`./${config.get('repository').type}_repository`).default : null;
 
-  if (!repository)
+  if (!Repository)
     throw Error(
       err.configFailed,
       i18n.t('领域仓库未正确配置，可以在config/repository.js中指定')
     );
-
+  repository = new Repository();
   return repository;
 };

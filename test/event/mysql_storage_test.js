@@ -1,7 +1,7 @@
 var assert = require('chai').assert;
 
-var config = require('../../lib/config');
-var mysql_storage = require('../../lib/event/mysql_storage');
+import config from '../../src/config';
+import MysqlStorage from '../../src/event/mysql_storage';
 
 config.init({
   mysql:{
@@ -12,15 +12,15 @@ config.init({
   }
 });
 
-describe('event', function() {
-  describe('mysql_storage', function () {
-    it('select mysql', function () {
-      var s = new mysql_storage();
-      s.select({
+describe('事件', function() {
+  describe('mysql数据存储服务', function () {
+    it('可以查询', function () {
+      var s = new MysqlStorage();
+      assert(s.select({
         id: 'aaa',
         name: 'test_event',
         version: 1
-      });
+      }));
     });
   });
 });

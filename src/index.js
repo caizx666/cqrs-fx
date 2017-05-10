@@ -1,15 +1,6 @@
-import * as bus from './bus';
-import commandhandler from './command/handler';
-import eventhandler from './event/handler';
-import aggregate from './aggregate';
-import * as repository from './repository';
-import app from './app';
-
-export default {
-  app,
-  bus,
-  aggregate,
-  repository,
-  commandhandler,
-  eventhandler
-};
+export * as bus from './bus';
+export CommandHandler from './command/handler';
+export EventHandler from './event/handler';
+export Aggregate from './aggregate';
+export * as repository from './repository';
+export App from './app';

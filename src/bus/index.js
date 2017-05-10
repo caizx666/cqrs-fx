@@ -3,7 +3,7 @@ import assert from 'assert';
 import config from '../config';
 import mqbus from './mq_bus';
 import directbus from './direct_bus';
-import dispatcher from './message_dispatcher';
+import MessageDispatcher from './message_dispatcher';
 import err from '../err';
 import i18n from '../i18n';
 
@@ -20,7 +20,7 @@ export function getDispatcher(type) {
 
     let dispatcherConfig = (busConfig[type + 'Dispatcher'] || busConfig.dispatcher) == 'message_dipatcher';
 
-    var dispatcher = dispatcherConfig ? new dispatcher() :
+    var dispatcher = dispatcherConfig ? new MessageDispatcher() :
       (dispatcherType ? new dispatcherType() : null);
 
     if (dispatcher === null)
