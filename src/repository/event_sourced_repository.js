@@ -6,6 +6,7 @@ import {
   isString
 } from '../utils';
 import * as bus from '../bus';
+import i18n from '../i18n';
 
 export default class {
   constructor() {
@@ -38,7 +39,7 @@ export default class {
       else
         throw {
           code: err.aggregateNotExists,
-          msg: `领域对象(id=${id})未能在数据库中找到.`
+          msg: i18n.t('领域对象未能在数据库中找到:')+`(id=${id})`
         };
     }
     return aggregateRoot;

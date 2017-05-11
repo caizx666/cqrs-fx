@@ -9,11 +9,11 @@ export function getProvider() {
     return provider;
   }
 
-  provider = require(`./${config.get('snapshot').provider||'event_number'}_provider`);
+  provider = require(`./${config.get('snapshot').provider||'event_number'}_provider`).default;
   if (!provider)
     throw Error(
       err.configFailed,
       i18n.t('快照提供服务未正确配置，可以在config/snapshot.js中指定')
     );
-
+  return provider;
 }

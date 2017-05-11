@@ -1,3 +1,4 @@
+import co from 'co';
 import * as repository from '../repository';
 import {
   isString
@@ -40,8 +41,11 @@ export default class DirectBus {
         data: msg.data
       });
     });
-    repository.getRepository().commit();
-    this.messageQueue.length = 0;
+    co(repository.getRepository().commit()).then(()=>{
+      //console.log(2);
+      this.messageQueue.length = 0;
+    });
+  //  console.log(1);
   }
 
   rollback() {

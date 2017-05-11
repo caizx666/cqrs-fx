@@ -5,7 +5,7 @@ import i18n from '../i18n';
 export default class {
   constructor() {
     let eventConfig = config.get('event');
-    let eventStorage = require(`./${eventConfig.storage}_storage`);
+    let eventStorage = require(`./${eventConfig.storage}_storage`).default;
     if (!eventStorage)
       throw Error(
         err.configFailed,
