@@ -136,7 +136,7 @@ export default class UserAccount extends Account {
 }
 ```
 
-### 处理器
+### 命令执行Handler
 
 ```js
 import {CommandHandler} from 'cqrs-fx';
@@ -159,7 +159,7 @@ export default class AccountCommandHandler extends CommandHandler {
 }
 ```
 
-领域事件订阅
+### 业务事件的Handler
 
 ```js
 import {EventHandler} from 'cqrs-fx';
@@ -167,11 +167,11 @@ import {EventHandler} from 'cqrs-fx';
 export default class AccountEventHandler extends EventHandler {
   db = mysql;
 
-  createAccount({userName, email}) {
+  accountCreated({userName, email}) {
     db.query('insert AccountTable (id, email) values (?userName,?email)', {userName,email});
   }
 
-  deleteAccount({userName}){
+  accountDeleted({userName}){
     db.query('delete from AccountTable where id = ?userName', {userName})
   }
 }
