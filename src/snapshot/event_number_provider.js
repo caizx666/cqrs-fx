@@ -6,6 +6,7 @@ import uuid from 'uuid';
 
 export default class EventNumberProvider extends SnapshotProvider{
   constructor(snapshotStorage) {
+    super();
     let snapshotConfig = config.get('snapshot');
 
     this.option = snapshotConfig.option;

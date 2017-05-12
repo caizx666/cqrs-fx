@@ -5,6 +5,7 @@ import EventStorage from './event_storage';
 
 export default class DomainEventStorage extends EventStorage{
   constructor() {
+    super();
     let eventConfig = config.get('event');
     let EventStorage = require(`./${eventConfig.storage}_storage`).default;
     if (!EventStorage)

@@ -7,6 +7,7 @@ import SnapshotStorage from './snapshot_storage';
 
 export default class RedisSnapshotStorage extends SnapshotStorage {
   constructor() {
+    super();
     let redisConfig = config.get('redis');
     this._password = redisConfig.password;
     this._hkey = 'cqrs_snapshot';

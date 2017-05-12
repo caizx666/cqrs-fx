@@ -25,7 +25,7 @@ export function getDispatcher(type) {
     var dispatcher = dispatcherConfig ? new MessageDispatcher() :
       (dispatcherLoader ? dispatcherLoader() : (busConfig[type + 'Dispatcher'] || busConfig.dispatcher));
 
-    if (!(dispatcher instanceof  Dispatcher))
+    if (!(dispatcher instanceof Dispatcher))
       throw {
         code: err.configFailed,
         msg: type + i18n.t('消息分发器未正确配置，可以在config/bus.js中指定')
@@ -36,31 +36,31 @@ export function getDispatcher(type) {
   return instance[type + 'Dispatcher'];
 }
 
-export function getEventDispatcher(){
+export function getEventDispatcher() {
   return getDispatcher('event');
 }
 
-export function getCommandDispatcher(){
+export function getCommandDispatcher() {
   return getDispatcher('command');
 }
 
 export function getBus(type) {
   assert(type === 'command' || type === 'event');
-if (!instance[type + 'Bus']) {
-  const busConfig = config.get('bus');
+  if (!instance[type + 'Bus']) {
+    const busConfig = config.get('bus');
 
-  let busType = typeof (busConfig[type + 'Bus'] || busConfig.type) === 'function' ?
-    (busConfig[type + 'Bus'] || busConfig.type) : null;
+    let busType = typeof (busConfig[type + 'Bus'] || busConfig.type) === 'function' ?
+      (busConfig[type + 'Bus'] || busConfig.type) : null;
 
-  var bus = (busConfig[type + 'Bus'] || busConfig.type) === 'mq' ? new mqbus() :
-    (busConfig[type + 'Bus'] || busConfig.type) === 'direct' ? new directbus(type, getDispatcher(type)) :
-    busType ? new busType(type, getDispatcher(type)) : null;
+    var bus = (busConfig[type + 'Bus'] || busConfig.type) === 'mq' ? new mqbus() :
+      (busConfig[type + 'Bus'] || busConfig.type) === 'direct' ? new directbus(type, getDispatcher(type)) :
+      busType ? new busType(type, getDispatcher(type)) : null;
 
-  if (!(bus instanceof Bus))
-    throw {
-      code: err.configFailed,
-      msg: type + i18n.t('消息总线未正确配置，可以在config/bus.js中指定')
-    };
+    if (!(bus instanceof Bus))
+      throw {
+        code: err.configFailed,
+        msg: type + i18n.t('消息总线未正确配置，可以在config/bus.js中指定')
+      };
 
     instance[type + 'Bus'] = bus;
   }
@@ -68,15 +68,15 @@ if (!instance[type + 'Bus']) {
   return instance[type + 'Bus'];
 }
 
-export function getEventBus(){
+export function getEventBus() {
   return getBus('event');
 }
 
-export function getCommandBus(){
+export function getCommandBus() {
   return getBus('command');
 }
 
-export function publish(type, ...messages) {
+export async function publish(type, ...messages) {
   assert(type === 'command' || type === 'event');
 
   let msgs = [];
@@ -91,13 +91,13 @@ export function publish(type, ...messages) {
 
   const bus = getBus(type);
   bus.publish(...msgs);
-  bus.commit();
+  await bus.commit();
 }
 
-export function publishEvent(...messages){
-  publish('event',...messages);
+export async function publishEvent(...messages) {
+  await publish('event', ...messages);
 }
 
-export function publishCommand(...messages){
-  publish('command',...messages);
+export async function publishCommand(...messages) {
+  await publish('command', ...messages);
 }

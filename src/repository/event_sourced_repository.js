@@ -10,9 +10,7 @@ import i18n from '../i18n';
 import Repository from './repository';
 
 export default class EventSourcedRepository extends Repository {
-  constructor() {
-    this._saveHash = [];
-  }
+  _saveHash = []
 
   createAggregate(name, id, props) {
     let CLS = aggregate.get(name);
@@ -40,7 +38,7 @@ export default class EventSourcedRepository extends Repository {
       else
         throw {
           code: err.aggregateNotExists,
-          msg: i18n.t('领域对象未能在数据库中找到:')+`(id=${id})`
+          msg: i18n.t('领域对象未能在数据库中找到:') + `(id=${id})`
         };
     }
     return aggregateRoot;

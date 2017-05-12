@@ -6,7 +6,7 @@ import {
 import i18n from '../i18n';
 import Bus from './bus';
 
-export default class DirectBus extends Bus{
+export default class DirectBus extends Bus {
   constructor(type, dispatcher) {
     super();
     this.messageQueue = [];
@@ -44,7 +44,7 @@ export default class DirectBus extends Bus{
       });
     });
     const rep = repository.getRepository();
-    await co(rep.commit());
+    await rep.commit();
     this.messageQueue.length = 0;
   }
 

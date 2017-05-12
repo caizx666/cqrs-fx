@@ -1,6 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import nuuid from 'uuid';
+export co from 'co';
 
 export const uuid = nuuid;
 

@@ -9,6 +9,7 @@ import EventStorage from './event_storage';
 
 export default class MySqlEventStorage extends EventStorage {
   constructor() {
+    super();
     this._tableName = config.get('event').table;
     this._addList = [];
   }

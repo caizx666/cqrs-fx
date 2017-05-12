@@ -9,6 +9,7 @@ import SnapshotStorage from './snapshot_storage';
 
 export default class MySqlSnapshotStorage extends SnapshotStorage {
   constructor() {
+    super();
     this._tableName = config.get('snapshot').table;
     this._actionList = [];
   }
