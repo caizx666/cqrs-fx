@@ -1,10 +1,10 @@
 
 export default class  {
   constructor(){
-    
+
   }
 
-  run(event){
-
+  run(message){
+    return true;
   }
 }

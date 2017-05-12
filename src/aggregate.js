@@ -61,21 +61,24 @@ export default class Aggregate {
     if (this._domainEventHandlers[eventname])
       return this._domainEventHandlers[eventname];
     let handlers = [];
-    for (var p in this) {
-      let handler = snapshot[p];
-      if ((!p.endWith('Event') && !p.endWith('Handler')) || typeof handler !== 'function')
-        continue;
-      handlers.push(handler);
+    if (typeof this[eventname] == 'function') {
+      handlers.push(this[eventname]);
     }
+    // todo send to event bus？
     this._domainEventHandlers[eventname] = handlers;
     return handlers;
   }
 
   _handleEvent(event) {
     let handlers = this._getDomainEventHandlers(event.name);
+    this.when(event);
     for (var handler of handlers) {
       handler(event.data);
     }
+  }
+
+  when(event) {
+    // todo overlaod
   }
 
   buildFromSnapshot(snapshot) {

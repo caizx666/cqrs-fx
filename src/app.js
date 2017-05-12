@@ -42,7 +42,6 @@ export default class App {
     if (!config.appPath || typeof config.appPath !== 'string') {
       throw new Error(i18n.t('appPath无效无法加载CRQS应用'));
     }
-
   }
 
   loadSubModule(name) {

@@ -1,20 +1,22 @@
 import * as repository from '../repository';
-import aggregate from '../aggregate';
+import Aggregate from '../aggregate';
 
 export default class CommandHandler {
-  constructor() {
-    this.repository = repository.getRepository();
-    this.aggregate = aggregate;
-    this.module = null; // module会在构造完后赋值
+  constructor(module) {
+    this.module = module;
   }
 
-  get(name, module) {
+  get repository(){
+    return repository.getRepository();
+  }
+
+  getAggregate(name, module) {
     if (!module)
       module = this.module;
-    return aggregate.get(name, module);
+    return Aggregate.get(name, module);
   }
 
-  run(command) {
-
+  run(message) {
+    return true;
   }
 }
