@@ -4,17 +4,10 @@ import i18n from '../i18n';
 import EventStorage from './event_storage';
 
 export default class DomainEventStorage extends EventStorage{
-  constructor() {
+  constructor(eventStorage) {
     super();
-    let eventConfig = config.get('event');
-    let EventStorage = require(`./${eventConfig.storage}_storage`).default;
-    if (!EventStorage)
-      throw Error(
-        err.configFailed,
-        i18n.t('事件存储服务未正确配置，可以在config/event.js中指定')
-      );
 
-    this.eventStorage = new EventStorage();
+    this.eventStorage = eventStorage;
   }
 
   async loadEvents(name, id, version) {
