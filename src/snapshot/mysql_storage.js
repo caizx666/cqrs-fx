@@ -2,18 +2,19 @@ import config from '../config';
 import {
   expr
 } from '../utils';
-import mysql from '../storage/mysql';
+import {
+  pool as db
+} from '../storage/mysql';
 
-export default class MysqlStorage{
+export default class MysqlStorage {
   constructor() {
     this._tableName = config.get('snapshot').table;
     this._actionList = [];
-    this.db = mysql.pool;
   }
 
   count(spec) {
     return new Promise(function (resolve, reject) {
-      this.db.query('select count(*) from ?? where ??', [this._tableName, expr(spec)], function (err, result) {
+      db.query('select count(*) from ?? where ??', [this._tableName, expr(spec)], function (err, result) {
         if (err) reject(err);
         resolve(result[0][0]);
       });
@@ -22,7 +23,7 @@ export default class MysqlStorage{
 
   first(spec) {
     return new Promise(function (resolve, reject) {
-      this.db.query('select id,aggregate_root_type,aggregate_root_id,data,version,branch,timestamp from ?? where ?? order by version asc ', [this._tableName, expr(spec)], function (err, ...result) {
+      db.query('select id,aggregate_root_type,aggregate_root_id,data,version,branch,timestamp from ?? where ?? order by version asc ', [this._tableName, expr(spec)], function (err, ...result) {
         if (err) reject(err);
         resolve(result);
       });
@@ -78,7 +79,7 @@ export default class MysqlStorage{
         resolve();
         return;
       }
-      this.db.getConnection(function (err, connection) {
+      db.getConnection(function (err, connection) {
         connection.beginTransaction(function (err) {
           if (err) reject(err);
           list.forEach(function (item) {

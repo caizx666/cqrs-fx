@@ -33,7 +33,7 @@ export default class DirectBus {
     this.messageQueue.length = 0;
   }
 
-  commit() {
+  async commit() {
     this.messageQueue.forEach(msg => {
       this.dispatcher.dispatch({
         type: this.type,
@@ -41,14 +41,12 @@ export default class DirectBus {
         data: msg.data
       });
     });
-    co(repository.getRepository().commit()).then(()=>{
-      //console.log(2);
-      this.messageQueue.length = 0;
-    });
-  //  console.log(1);
+    const rep = repository.getRepository();
+    await co(rep.commit());
+    this.messageQueue.length = 0;
   }
 
-  rollback() {
-    repository.getRepository().rollback();
+  async rollback() {
+    await co(repository.getRepository().rollback());
   }
 }

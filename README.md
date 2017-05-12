@@ -1,4 +1,4 @@
-一个漂亮的 CQRS 项目
+cqrs-fx 定义为一个可配置、可扩展、EventSourced、面向对象的CQRS框架。
 
 安装：
 
@@ -33,4 +33,10 @@ cqrs.publishCommand({
   }
 });
 
-项目结构：
+模块代码：
+
+
+配置性：
+
+
+扩展性：

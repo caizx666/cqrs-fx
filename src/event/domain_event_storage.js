@@ -5,14 +5,14 @@ import i18n from '../i18n';
 export default class {
   constructor() {
     let eventConfig = config.get('event');
-    let eventStorage = require(`./${eventConfig.storage}_storage`).default;
-    if (!eventStorage)
+    let EventStorage = require(`./${eventConfig.storage}_storage`).default;
+    if (!EventStorage)
       throw Error(
         err.configFailed,
         i18n.t('事件存储服务未正确配置，可以在config/event.js中指定')
       );
 
-    this.eventStorage = eventStorage;
+    this.eventStorage = new EventStorage();
   }
 
   async loadEvents(name, id, version) {
