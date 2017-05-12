@@ -1,6 +1,4 @@
-import {
-  CommandHandler
-} from '../../../src';
+import {CommandHandler} from '../../../../src';
 
 export default class AccountCommandHandler extends CommandHandler {
   async createAccount(message) {
@@ -13,10 +11,10 @@ export default class AccountCommandHandler extends CommandHandler {
 
   async deleteAccount(message) {
     await this.repository.use(async() => {
-        const userAccount = this.repository.get('UserAccount');
-        userAccount.delete();
-        await this.repository.save(userAccount);
-        await this.repository.commit();
-      }
-    }
+      const userAccount = this.repository.get('UserAccount');
+      userAccount.delete();
+      await this.repository.save(userAccount);
+      await this.repository.commit();
+    });
   }
+}

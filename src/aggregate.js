@@ -1,5 +1,5 @@
-import register from './register';
 import {
+  fxData,
   _require
 } from './core';
 import err from './err';
@@ -23,7 +23,7 @@ export default class Aggregate {
   // 获取聚合根对象类型
   static get(name, module) {
     if (!module) return null;
-    let alias = register.domain[`${module}/domain/${name}`];
+    let alias = fxData.alias[`${module}/domain/${name}`];
     if (!alias) return null;
     return _require(alias);
   }

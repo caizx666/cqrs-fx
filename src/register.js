@@ -59,7 +59,7 @@ function _registerHandler(itemType) {
     }
     // 补充默认handler文件夹中的handler
     for (let alias in fxData.alias) {
-      if (alias.indexOf('/' + itemType + 's/') == -1)
+      if (alias.indexOf('/' + itemType + '/') == -1)
         continue;
       let messageType = alias.trimRight('handler');
       let array = handlers[messageType] || [];

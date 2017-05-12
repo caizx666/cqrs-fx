@@ -7,9 +7,6 @@ import {
   _require
 } from './core';
 import {
-  register
-} from './register';
-import {
   safeRequire,
   log,
   isDir,
@@ -134,7 +131,6 @@ export default class App {
     this.checkEnv();
     this.loadModule();
     this.loadCQRS();
-    register();
   }
 
   preload() {

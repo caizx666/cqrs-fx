@@ -41,7 +41,7 @@ export function alias(type, paths) {
 }
 
 let _loadRequire = (name, filepath) => {
-  let obj = _safeRequire(filepath);
+  let obj = safeRequire(filepath);
   if (isFunction(obj)) {
     obj.prototype.__type = name;
     obj.prototype.__filename = filepath;

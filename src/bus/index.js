@@ -17,13 +17,17 @@ export function getDispatcher(type) {
 
     const busConfig = config.get('bus');
 
-    let dispatcherLoader = typeof (busConfig[type + 'Dispatcher'] || busConfig.dispatcher) === 'function' ?
-      (busConfig[type + 'Dispatcher'] || busConfig.dispatcher) : null;
+    let dispatcherLoader = typeof(busConfig[type + 'Dispatcher'] || busConfig.dispatcher) === 'function'
+      ? (busConfig[type + 'Dispatcher'] || busConfig.dispatcher)
+      : null;
 
     let dispatcherConfig = (busConfig[type + 'Dispatcher'] || busConfig.dispatcher) == 'message_dipatcher';
 
-    var dispatcher = dispatcherConfig ? new MessageDispatcher() :
-      (dispatcherLoader ? dispatcherLoader() : (busConfig[type + 'Dispatcher'] || busConfig.dispatcher));
+    var dispatcher = dispatcherConfig
+      ? new MessageDispatcher()
+      : (dispatcherLoader
+        ? dispatcherLoader()
+        : (busConfig[type + 'Dispatcher'] || busConfig.dispatcher));
 
     if (!(dispatcher instanceof Dispatcher))
       throw {
@@ -49,12 +53,17 @@ export function getBus(type) {
   if (!instance[type + 'Bus']) {
     const busConfig = config.get('bus');
 
-    let busType = typeof (busConfig[type + 'Bus'] || busConfig.type) === 'function' ?
-      (busConfig[type + 'Bus'] || busConfig.type) : null;
+    let busType = typeof(busConfig[type + 'Bus'] || busConfig.type) === 'function'
+      ? (busConfig[type + 'Bus'] || busConfig.type)
+      : null;
 
-    var bus = (busConfig[type + 'Bus'] || busConfig.type) === 'mq' ? new mqbus() :
-      (busConfig[type + 'Bus'] || busConfig.type) === 'direct' ? new directbus(type, getDispatcher(type)) :
-      busType ? new busType(type, getDispatcher(type)) : null;
+    var bus = (busConfig[type + 'Bus'] || busConfig.type) === 'mq'
+      ? new mqbus()
+      : (busConfig[type + 'Bus'] || busConfig.type) === 'direct'
+        ? new directbus(type, getDispatcher(type))
+        : busType
+          ? new busType(type, getDispatcher(type))
+          : null;
 
     if (!(bus instanceof Bus))
       throw {
@@ -80,11 +89,14 @@ export async function publish(type, ...messages) {
   assert(type === 'command' || type === 'event');
 
   let msgs = [];
-  if (messages.length == 2 && typeof messages[0] === 'string') {
-    msgs.push({
-      name: messages[0],
-      data: message[1]
-    });
+  if (messages.length == 3 && typeof messages[0] === 'string') {
+    msgs.push({module: messages[0], name: message[1], data: message[2]});
+  } else if (messages.length == 2 && typeof messages[0] === 'string') {
+    const mn = messages[0].split('/');
+    if (mn.length != 2){
+      throw new Error(i18n.t('消息name需要包含module/name信息'));
+    }
+    msgs.push({module: mn[0], name: mn[1], data: message[1]});
   } else {
     msgs = messages;
   }

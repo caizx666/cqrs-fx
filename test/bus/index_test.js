@@ -1,9 +1,14 @@
 import {assert} from 'chai';
 import * as bus from '../../src/bus';
+import config from '../../src/config';
 
 describe('消息总线', function () {
   it('发送命令同步执行', function () {
-    debugger
+    config.init({
+      bus:{
+
+      }
+    });
     bus.publishCommand({
       name: 'do1',
       data:{
