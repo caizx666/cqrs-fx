@@ -143,20 +143,22 @@ import {CommandHandler} from 'cqrs-fx';
 
 export default class AccountCommandHandler extends CommandHandler {
   createAccount(message) {
-    const userAccount = this.getAggregate('UserAccount').create(message);
-    this.repository.save(userAccount);
-    this.repository.commit();
-    return true;
+    this.repository.use(() => {
+      const userAccount = this.getAggregate('UserAccount').create(message);
+      this.repository.save(userAccount);
+      this.repository.commit();
+    });
   }
 
-  deleteAccount(message){
-    const userAccount =  this.repository.get('UserAccount');
-    userAccount.delete();
-    this.repository.save(userAccount);
-    this.repository.commit();
-    return true;
+  deleteAccount(message) {
+    this.repository.use(() => {
+        const userAccount = this.repository.get('UserAccount');
+        userAccount.delete();
+        this.repository.save(userAccount);
+        this.repository.commit();
+      }
+    }
   }
-}
 ```
 
 ### 业务事件的Handler
@@ -206,7 +208,7 @@ new App({
 });
 ```
 
-type可以配置为一个对象或加载函数
+可以配置为一个对象或加载函数
 
 ```js
 new App({

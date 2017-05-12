@@ -7,8 +7,9 @@ import {
 } from '../utils';
 import * as bus from '../bus';
 import i18n from '../i18n';
+import Repository from './repository';
 
-export default class {
+export default class EventSourcedRepository extends Repository {
   constructor() {
     this._saveHash = [];
   }

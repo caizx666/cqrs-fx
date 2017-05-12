@@ -1,8 +1,9 @@
 import config from '../config';
 import err from '../err';
 import i18n from '../i18n';
+import EventStorage from './event_storage';
 
-export default class {
+export default class DomainEventStorage extends EventStorage{
   constructor() {
     let eventConfig = config.get('event');
     let EventStorage = require(`./${eventConfig.storage}_storage`).default;

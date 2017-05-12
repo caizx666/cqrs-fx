@@ -10,13 +10,12 @@ import {
   registry
 } from '../register';
 import i18n from '../i18n';
+import Dispatcher from './dispatcher';
 
-export default class MessageDispatcher {
-  constructor() {
-    this._dispatchingListeners = [];
-    this._dispatchFailedListeners = [];
-    this._dispatchedListeners = [];
-  }
+export default class MessageDispatcher extends Dispatcher {
+  _dispatchingListeners = []
+  _dispatchFailedListeners = []
+  _dispatchedListeners = []
 
   // message = {name,type,data}
   dispatch(message) {

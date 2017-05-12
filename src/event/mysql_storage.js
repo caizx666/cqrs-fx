@@ -5,8 +5,9 @@ import {
 import {
   pool as db
 } from '../storage/mysql';
+import EventStorage from './event_storage';
 
-export default class {
+export default class MySqlEventStorage extends EventStorage {
   constructor() {
     this._tableName = config.get('event').table;
     this._addList = [];

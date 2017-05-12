@@ -6,6 +6,8 @@ import directbus from './direct_bus';
 import MessageDispatcher from './message_dispatcher';
 import err from '../err';
 import i18n from '../i18n';
+import Dispatcher from './dispatcher';
+import Bus from './bus';
 
 const instance = {};
 
@@ -15,15 +17,15 @@ export function getDispatcher(type) {
 
     const busConfig = config.get('bus');
 
-    let dispatcherType = typeof (busConfig[type + 'Dispatcher'] || busConfig.dispatcher) === 'function' ?
+    let dispatcherLoader = typeof (busConfig[type + 'Dispatcher'] || busConfig.dispatcher) === 'function' ?
       (busConfig[type + 'Dispatcher'] || busConfig.dispatcher) : null;
 
     let dispatcherConfig = (busConfig[type + 'Dispatcher'] || busConfig.dispatcher) == 'message_dipatcher';
 
     var dispatcher = dispatcherConfig ? new MessageDispatcher() :
-      (dispatcherType ? new dispatcherType() : null);
+      (dispatcherLoader ? dispatcherLoader() : (busConfig[type + 'Dispatcher'] || busConfig.dispatcher));
 
-    if (dispatcher === null)
+    if (!(dispatcher instanceof  Dispatcher))
       throw {
         code: err.configFailed,
         msg: type + i18n.t('消息分发器未正确配置，可以在config/bus.js中指定')
@@ -54,7 +56,7 @@ if (!instance[type + 'Bus']) {
     (busConfig[type + 'Bus'] || busConfig.type) === 'direct' ? new directbus(type, getDispatcher(type)) :
     busType ? new busType(type, getDispatcher(type)) : null;
 
-  if (bus === null)
+  if (!(bus instanceof Bus))
     throw {
       code: err.configFailed,
       msg: type + i18n.t('消息总线未正确配置，可以在config/bus.js中指定')

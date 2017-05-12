@@ -3,8 +3,9 @@ import {
   log
 } from '../utils';
 import config from '../config';
+import SnapshotStorage from './snapshot_storage';
 
-export default class {
+export default class RedisSnapshotStorage extends SnapshotStorage {
   constructor() {
     let redisConfig = config.get('redis');
     this._password = redisConfig.password;

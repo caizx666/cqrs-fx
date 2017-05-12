@@ -4,9 +4,11 @@ import {
   isString
 } from '../utils';
 import i18n from '../i18n';
+import Bus from './bus';
 
-export default class DirectBus {
+export default class DirectBus extends Bus{
   constructor(type, dispatcher) {
+    super();
     this.messageQueue = [];
     this.type = type;
     this.dispatcher = dispatcher;

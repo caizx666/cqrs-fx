@@ -4,10 +4,10 @@ import {App,bus} from '../src';
 import {registry} from '../src/register';
 
 describe('应用测试', function () {
-  it('模块加载数量应该和文件夹里的一致', function () {
+  it('领域对象UserAccount应该被加载', function () {
     new App({
       appPath: path.join(__dirname, 'demo')
     }).run();
-    assert(registry.domain['module1/domain/user1']);
+    assert(registry.domain['module1/domain/UserAccount']);
   });
 });

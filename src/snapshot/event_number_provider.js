@@ -1,23 +1,18 @@
 import config from '../config';
 import err from '../err';
-import eventStorage from '../event/domain_event_storage';
+import DomainEventStorage from '../event/domain_event_storage';
+import SnapshotProvider from './snapshot_provider';
 import uuid from 'uuid';
 
-export default class {
-  constructor() {
+export default class EventNumberProvider extends SnapshotProvider{
+  constructor(snapshotStorage) {
     let snapshotConfig = config.get('snapshot');
-    let snapshotStorage = require(`./${snapshotConfig.storage}_storage`);
-    if (!snapshotStorage)
-      throw {
-        code: err.configFailed,
-        msg: '快照数据存储服务未正确配置，可以在config/snapshot.js中指定'
-      };
 
     this.option = snapshotConfig.option;
     this.numOfEvents = snapshotConfig.numberOfEvents;
 
     this.snapshotStorage = snapshotStorage;
-    this.eventStorage = eventStorage;
+    this.eventStorage = new DomainEventStorage();
 
     this._snapshotMapping = new Map();
   }
