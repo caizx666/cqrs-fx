@@ -6,11 +6,14 @@
 
 ## 安装：
 
-`npm install cqrs-fx --save`
+```
+npm install cqrs-fx --save
+```
 
 ## 常规调用：
 
-`import {App} from 'cqrs-fx';
+```js
+import {App} from 'cqrs-fx';
 import path from 'path';
 
 const cqrs = new App({
@@ -32,7 +35,8 @@ cqrs.publishCommand('createAccount',
       a:'hello',
       b: 28
     }
-  });`
+  });
+```
 
 ** App不要创建多个实例，整个系统都是单例的 **
 
@@ -42,7 +46,8 @@ cqrs.publishCommand('createAccount',
 
 ### 领域对象
 
-`import {Aggregate} from 'cqrs-fx';
+```js
+import {Aggregate} from 'cqrs-fx';
 
 export default class Account extends Aggregate {
   userName;
@@ -50,9 +55,11 @@ export default class Account extends Aggregate {
   displayName;
   email;
 
-}`
+}
+```
 
-`export default class UserAccount extends Account {
+```js
+export default class UserAccount extends Account {
   contactPhone;
   contactAddress;
 
@@ -99,35 +106,40 @@ export default class Account extends Aggregate {
   }
 }
 
-`
+```
 
 ### 命令
 
 由name和data组成
 
-`{
+```js
+{
   name: 'createAccount',
   data:{
     name: 'xxxx',
     email: 'xxxx'
   }
-}`
+}
+```
 
 ### 事件
 
 和命令对象雷同
 
-`{
+```js
+{
   name: 'accountCreated',
   data:{
     name: 'xxxx',
     email: 'xxxx'
   }
-}`
+}
+```
 
 ### 处理器
 
-`import {CommandHandler} from 'cqrs-fx';
+```js
+import {CommandHandler} from 'cqrs-fx';
 
 export default class AccountCommandHandler extends CommandHandler {
   createAccount(message) {
@@ -144,11 +156,13 @@ export default class AccountCommandHandler extends CommandHandler {
     this.repository.commit();
     return true;
   }
-}`
+}
+```
 
 领域事件订阅
 
-`import {EventHandler} from 'cqrs-fx';
+```js
+import {EventHandler} from 'cqrs-fx';
 
 export default class AccountEventHandler extends EventHandler {
   db = mysql;
@@ -160,13 +174,15 @@ export default class AccountEventHandler extends EventHandler {
   deleteAccount({userName}){
     db.query('delete from AccountTable where id = ?userName', {userName})
   }
-}`
+}
+```
 
 ## 配置性 && 扩展性：
 
 可以通过构造App实例时配置系统
 
-`new App({
+```js
+new App({
   appPath: path.join(__dirname, 'demo'),
   mysql: {
     host: 'localhost',
@@ -187,11 +203,13 @@ export default class AccountEventHandler extends EventHandler {
   snapshot: {
     provider: 'event_number'
   }
-});`
+});
+```
 
 type可以配置为一个对象或加载函数
 
-`new App({
+```js
+new App({
   bus: {
     commandBus: MyCommandBus,
     eventBus: ()=> new MyEventBus({...})
@@ -205,4 +223,5 @@ type可以配置为一个对象或加载函数
   snapshot: {
     provider: eventBus: ()=> new MySnapshotProvider({...})
   }
-});`
+});
+```
