@@ -185,9 +185,14 @@ export default class AccountEventHandler extends EventHandler {
 new App({
   appPath: path.join(__dirname, 'demo'),
   bus: {
-    commandBus: 'direct',
-    eventBus: 'mq'  
-    dispatcher: 'message_dipatcher'
+    dispatcher : 'message_dipatcher',
+    commandBus : 'direct',
+    eventBus : 'mq',
+    eventMQ : {
+      name: 'eventqueue',
+      port: 6379,
+      host: '127.0.0.1'
+    }
   },
   event: {
     storage: 'mongo_domain_event'
