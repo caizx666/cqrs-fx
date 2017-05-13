@@ -4,9 +4,9 @@ import i18n from '../i18n';
 import SnapshotProvider from './snapshot_provider';
 import SnapshotStorage from './snapshot_storage';
 import EventSourcedRepository from './event_number_provider';
-import MongoSnapshotStorage from './mongo_storage';
-import MySqlSnapshotStorage from './mysql_storage';
-import RedisSnapshotStorage from './redis_storage';
+import MongoSnapshotStorage from './mongo_snapshot_storage';
+import MySqlSnapshotStorage from './mysql_snapshot_storage';
+import RedisSnapshotStorage from './redis_snapshot_storage';
 
 let provider;
 let storage;

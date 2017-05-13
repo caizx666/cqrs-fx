@@ -1,6 +1,7 @@
 import DomainEventStorage from './domain_event_storage';
 import EventStorage from './event_storage';
-import MySqlStorage from './mysql_storage';
+import MySqlEventStorage from './mysql_event_storage';
+import MongoEventStorage from './mongo_event_storage';
 import config from '../config';
 import err from '../err';
 import i18n from '../i18n';
@@ -25,10 +26,10 @@ export function getStorage(name) {
     storage = new DomainEventStorage(getStorage('mongo'));
     break;
   case 'mysql':
-    storage = new MySqlStorage();
+    storage = new MySqlEventStorage();
     break;
   case 'mongo':
-    storage = new MySqlStorage();
+    storage = new MongoEventStorage();
     break;
   default:
     storage = storeageLoader ? storeageLoader() : evtConfig.storage;

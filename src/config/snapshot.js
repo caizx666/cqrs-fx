@@ -1,7 +1,7 @@
 export default {
   provider: 'event_number',
   storage: 'mongo',  // redis mysql mongo
-  table: 'snapshots',
+  collection: 'snapshots',
   // immediate: Indicates that immediate snapshot create/update should be performed.
   // postpone: Indicates that the creating/updating of the snapshots  would be postponed to a later scenario.
   option: 'immediate',

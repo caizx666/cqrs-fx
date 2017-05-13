@@ -31,13 +31,6 @@ export default class RedisSnapshotStorage extends SnapshotStorage {
 
   }
 
-  update(dto, spec) {
-
-  }
-
-  inert(dto) {
-
-  }
 
   commit() {
     let _commit = function functionName() {
@@ -52,7 +45,5 @@ export default class RedisSnapshotStorage extends SnapshotStorage {
     }
   }
 
-  rollback() {
 
-  }
 }

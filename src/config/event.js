@@ -1,4 +1,7 @@
 export default {
-  storage: 'domain_event',
-  table: 'events'
+  storage: 'mongo_domain_event',
+  collection: 'events',
+  mongo:{
+
+  }
 };

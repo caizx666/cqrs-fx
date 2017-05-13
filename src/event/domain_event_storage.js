@@ -28,7 +28,7 @@ export default class DomainEventStorage extends EventStorage{
       events.push({
         data: JSON.parse(s.data),
         data: s.data,
-        eventType: s.name,
+        eventname: s.name,
         eventid: s.event_id,
         sourceid: s.source_id,
         branch: s.branch,
@@ -42,7 +42,7 @@ export default class DomainEventStorage extends EventStorage{
   async saveEvent(event) {
     await this.eventStorage.inert({
       id: uuid.v1(),
-      eventType: event.name,
+      eventname: event.name,
       eventid: event.id,
       sourceid: event.sourceid,
       data: JSON.stringify(event.data),
