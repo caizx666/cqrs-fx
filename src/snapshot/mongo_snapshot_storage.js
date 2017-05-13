@@ -90,7 +90,6 @@ export default class MongoSnapshotStorage extends SnapshotStorage {
         }));
       }
       this._actionList.filter(item => item.action == 1).forEach(async({data, spec}) => {
-        console.log(spec)
         await collection.updateOne({
           _id: spec.id
         }, {$set: data});

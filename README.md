@@ -18,11 +18,8 @@ import path from 'path';
 
 const cqrs = new App({
   appPath: path.join(__dirname, 'demo'),
-  mysql:{
-    host     : 'localhost',
-    user     : 'root',
-    password : '123456',
-    database : 'cqrsdb'
+  mongo:{
+    url: 'mongodb://localhost:27017/cqrs'
   }
 });
 
@@ -56,9 +53,7 @@ export default class Account extends Aggregate {
   email;
 
 }
-```
 
-```js
 export default class UserAccount extends Account {
   contactPhone;
   contactAddress;
@@ -186,24 +181,60 @@ export default class AccountEventHandler extends EventHandler {
 ```js
 new App({
   appPath: path.join(__dirname, 'demo'),
+  bus: {
+    commandBus: 'direct',
+    eventBus: 'mq'  
+    dispatcher: 'message_dipatcher'
+  },
+  event: {
+    storage: 'mongo_domain_event'
+    collection: 'events',
+    mongo:{
+      ...
+    },
+    mysql:{
+      ...
+    },
+    redis:{
+      ...
+    }
+  },
+  repository: {
+    type: 'event_sourced'
+  },
+  snapshot: {
+    provider: 'event_number',
+    storage: 'mongo',  // redis mysql mongo ...
+    collection: 'snapshots',
+    // immediate: Indicates that immediate snapshot create/update should be performed.
+    // postpone: Indicates that the creating/updating of the snapshots  would be postponed to a later scenario.
+    option: 'immediate',
+    // 快照的保存周期，默认每100个事件保存一次快照
+    numberOfEvents: 100,
+    mongo:{
+      ...
+    },
+    mysql:{
+      ...
+    },
+    redis:{
+      ...
+    }
+  },
+  mongo:{
+    url: 'mongodb://localhost:27017/cqrs'
+  },
   mysql: {
     host: 'localhost',
     user: 'root',
     password: '123456',
     database: 'cqrsdb'
   },
-  bus: {
-    commandBus: 'direct',
-    eventBus: 'mq'
-  },
-  event: {
-    storage: 'domain_event'
-  },
-  repository: {
-    type: 'event_sourced'
-  },
-  snapshot: {
-    provider: 'event_number'
+  redis:{
+    host: "127.0.0.1",
+    port: 6379,
+    password: "",
+    timeout: 0
   }
 });
 ```
@@ -233,7 +264,7 @@ new App({
 ```js
 export default class AdminAccount extends Account {
   ...
-   
+
   doCreateSnapshot() {
     return {userName: this.userName, password: this.password, displayName: this.displayName, email: this.email};
   }

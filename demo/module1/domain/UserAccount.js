@@ -23,6 +23,26 @@ export default class UserAccount extends Account {
     return userAccount;
   }
 
+  updateAddress(address){
+    if (!address) {
+      throw Error('地址不能为空');
+    }
+    this.raiseEvent('addressUpdated', {
+      userName:this.userName,
+      address
+    });
+  }
+
+  updateEmail(email){
+      if (!email) {
+        throw Error('email不能为空');
+      }
+      this.raiseEvent('emailUpdated', {
+        userName:this.userName,
+        email
+      });
+  }
+
   when({
     name,
     data
@@ -44,5 +64,13 @@ export default class UserAccount extends Account {
     this.email = email;
     this.contactPhone = contactPhone;
     this.contactAddress = contactAddress;
+  }
+
+  addressUpdated({address}){
+      this.contactAddress = address;
+  }
+
+  emailUpdated({email}){
+    this.email = email;
   }
 }
