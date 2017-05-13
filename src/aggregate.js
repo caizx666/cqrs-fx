@@ -37,7 +37,7 @@ export default class Aggregate {
     return this.__module;
   }
 
-  get alias(){
+  get alias() {
     return this.__type;
   }
 
@@ -63,8 +63,9 @@ export default class Aggregate {
 
   buildFromHistory(...historicalEvents) {
     this._uncommittedEvents.length = 0;
-    for (let de of historicalEvents)
+    for (const de of historicalEvents) {
       this._handleEvent(de);
+    }
     this._version = historicalEvents[historicalEvents.length - 1].version;
     this._eventVersion = this._version;
   }
@@ -82,7 +83,7 @@ export default class Aggregate {
 
   _handleEvent(event) {
     if (event.module != this.module) {
-      return;
+      throw new Error(err.moduleNotExists, event.module + '/' + event.name + i18n.t('事件无效，无法溯源到当前领域对象') + this.module + '/' + this.name);
     }
     let handlers = this._getDomainEventHandlers(event.name);
     if (isFunction(this.when)) {
@@ -135,7 +136,7 @@ export default class Aggregate {
     snapshot.branch = this.branch;
     snapshot.version = this.version;
     snapshot.timestamp = timestamp();
-    snapshot.aggregateRootID = this._id;
+    snapshot.aggregateRootID = this.id;
     return snapshot;
   }
 

@@ -26,10 +26,13 @@ describe('事件仓库', function() {
 
     const rep = new EventSourcedRepository();
     const agg = Aggregate.get('module1/UserAccount').create({userName: 'user1', password: '123456', displayName: '张三'});
+    //  console.log(agg)
     rep.save(agg);
     await rep.commit();
 
     const obj = await rep.get('module1/UserAccount', agg.id);
+    assert(obj);
+  //  console.log(obj)
     assert.equal(obj.userName, agg.userName);
     assert.equal(obj.password, agg.password);
     assert.equal(obj.displayName, agg.displayName);

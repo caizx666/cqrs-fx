@@ -1,7 +1,7 @@
 import {getProvider as getSnapshotProvider} from '../snapshot';
 import aggregate from '../aggregate';
 import {getStorage as getEventStorage} from '../event';
-import {isFunction, isString} from '../utils';
+import {isFunction, isString, log} from '../utils';
 import err from '../err';
 import {getEventBus} from '../bus';
 import i18n from '../i18n';
@@ -23,7 +23,8 @@ export default class EventSourcedRepository extends Repository {
     if (!isString(module)) {
       const mn = name.split('/');
       if (mn.length != 2) {
-        throw new Error(err.moduleNotExists, i18n.t('领域对象无法找到') + name);
+        log(i18n.t('领域对象无法找到') + name);
+        return null;
       }
       module = mn[0];
       name = mn[1];
@@ -33,22 +34,23 @@ export default class EventSourcedRepository extends Repository {
       return null;
     const aggregateRootAlias = `${module}/domain/${name}`;
     const snapshotProvider = getSnapshotProvider();
-    debugger
     if (snapshotProvider && await snapshotProvider.hasSnapshot(aggregateRootAlias, id)) {
       let snapshot = await snapshotProvider.getSnapshot(aggregateRootAlias, id);
       aggregateRoot.buildFromSnapshot(snapshot);
       var eventsAfterSnapshot = await getEventStorage().loadEvents(aggregateRootAlias, id, snapshot.version);
       if (eventsAfterSnapshot && eventsAfterSnapshot.length > 0)
-        aggregateRoot.buildFromHistory(eventsAfterSnapshot);
+        aggregateRoot.buildFromHistory(...eventsAfterSnapshot);
       }
     else {
       aggregateRoot.id = id;
       let evnts = await getEventStorage().loadEvents(aggregateRootAlias, id);
-      if (evnts != null && evnts.length > 0)
-        aggregateRoot.buildFromHistory(evnts);
-      else
-        throw new Error(err.aggregateNotExists, i18n.t('领域对象未能在数据库中找到:') + `(id=${id})`);
+      if (evnts != null && evnts.length > 0) {
+        aggregateRoot.buildFromHistory(...evnts);
+      } else {
+        log(i18n.t('领域对象未能在数据库中找到:') + `(id=${id})`);
+        return null;
       }
+    }
     return aggregateRoot;
   }
 
@@ -83,10 +85,10 @@ export default class EventSourcedRepository extends Repository {
   }
 
   async rollback() {
-    await getEventStorage().Rollback();
+    await getEventStorage().rollback();
     const snapshotProvider = getSnapshotProvider();
     if (snapshotProvider && snapshotProvider.option == 'immediate') {
-      await snapshotProvider.Rollback();
+      await snapshotProvider.rollback();
     }
   }
 }

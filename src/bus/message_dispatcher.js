@@ -8,8 +8,8 @@ export default class MessageDispatcher extends Dispatcher {
   _dispatchFailedListeners = []
   _dispatchedListeners = []
 
-  getHandlers(type, module, name) {
-    return Object.keys(fxData.alias).filter(item => item.startsWith(`${module}/${type}/`)).map(alias => _require(alias)).filter(item => isFunction(item.prototype[name]));
+  getHandlers(module, name) {
+    return Object.keys(fxData.alias).filter(item => item.startsWith(`${module}/${this.type}/`)).map(alias => _require(alias)).filter(item => isFunction(item.prototype[name]));
   }
 
   // message = {name,module,type,data}
@@ -20,6 +20,11 @@ export default class MessageDispatcher extends Dispatcher {
     }
     if (message.type !== 'event' && message.type !== 'command') {
       log(i18n.t('消息type无效'));
+      return;
+    }
+    if (message.type !== this.type) {
+      console.log(this.type)
+      log(message.type + i18n.t('消息无法分发'));
       return;
     }
 
@@ -39,15 +44,18 @@ export default class MessageDispatcher extends Dispatcher {
       log(i18n.t('消息module无效'));
       return;
     }
-    const handlers = this.getHandlers(message.type, module, name);
+    const handlers = this.getHandlers(module, name);
+    if (!handlers || handlers.length <= 0) {
+      log(i18n.t('无消息处理器'));
+    }
     let success = 0;
-    handlers.forEach(async(type) => {
+    for (const type of handlers) {
       var CLS = _require(type);
       if (!CLS || !isFunction(CLS))
-        return;
+        continue;
       var handler = new CLS();
       if (!handler || !isFunction(handler[name]))
-        return;
+        continue;
       const evt = {
         type: message.type,
         data: message.data,
@@ -55,20 +63,19 @@ export default class MessageDispatcher extends Dispatcher {
         name,
         handler
       };
-      log(i18n.t('分发消息') + message.name);
+      log(this.type + i18n.t('分发消息') + message.name);
       this._onDispatching(evt);
       try {
-        const fn = handler[name].bind(handler);
-        await fn(message.data || {});
+        await handler[name].bind(handler)(message.data || {});
         this._onDispatched(evt);
         success++;
-        log(i18n.t('分发消息') + message.name + i18n.t('完成'));
+        log(this.type + i18n.t('分发消息') + message.name + i18n.t('完成'));
       } catch (err) {
         evt.error = err;
-        log(i18n.t('分发消息') + message.name + i18n.t('失败，') + err);
+        log(this.type + i18n.t('分发消息') + message.name + i18n.t('失败，') + err);
         this._onDispatchFaild(evt);
       }
-    });
+    }
     return success;
   }
 

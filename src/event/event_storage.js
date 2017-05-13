@@ -7,6 +7,7 @@ export default class EventStorage {
   insert({
     id,
     name,
+    module,
     source_type,
     source_id,
     timestamp,
@@ -16,6 +17,7 @@ export default class EventStorage {
   }) {
     assert(id);
     assert(name);
+    assert(module);
     assert(source_type);
     assert(source_id);
     assert(timestamp);
@@ -25,6 +27,7 @@ export default class EventStorage {
     this._addList.push({
       id,
       name,
+      module,
       source_type,
       source_id,
       timestamp,

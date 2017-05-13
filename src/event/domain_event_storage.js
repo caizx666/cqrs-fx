@@ -30,6 +30,7 @@ export default class DomainEventStorage extends EventStorage {
       id: s.id,
       data: s.data,
       name: s.name,
+      module: s.module,
       sourceId: s.source_id,
       sourceAlias: s.source_type,
       branch: s.branch,
@@ -41,12 +42,14 @@ export default class DomainEventStorage extends EventStorage {
   async saveEvent(event) {
     assert(event.id);
     assert(event.name);
+    assert(event.module);
     assert(event.sourceId);
     assert(event.sourceAlias);
 
     await this.eventStorage.insert({
       id: event.id,
       name: event.name,
+      module: event.module,
       source_id: event.sourceId,
       source_type: event.sourceAlias,
       data: event.data,

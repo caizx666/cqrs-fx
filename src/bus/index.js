@@ -24,16 +24,14 @@ export function getDispatcher(type) {
     let dispatcherConfig = (busConfig[type + 'Dispatcher'] || busConfig.dispatcher) == 'message_dipatcher';
 
     var dispatcher = dispatcherConfig
-      ? new MessageDispatcher()
+      ? new MessageDispatcher(type)
       : (dispatcherLoader
-        ? dispatcherLoader()
+        ? dispatcherLoader(type)
         : (busConfig[type + 'Dispatcher'] || busConfig.dispatcher));
 
-    if (!(dispatcher instanceof Dispatcher))
-      throw {
-        code: err.configFailed,
-        msg: type + i18n.t('消息分发器未正确配置，可以在config/bus.js中指定')
-      };
+    if (!(dispatcher instanceof Dispatcher)) {
+      throw new Error(err.configFailed, type + i18n.t('消息分发器未正确配置，可以在config/bus.js中指定'));
+    }
     instance[type + 'Dispatcher'] = dispatcher;
   }
 
@@ -58,7 +56,7 @@ export function getBus(type) {
       : null;
 
     var bus = (busConfig[type + 'Bus'] || busConfig.type) === 'mq'
-      ? new mqbus()
+      ? new mqbus(type)
       : (busConfig[type + 'Bus'] || busConfig.type) === 'direct'
         ? new directbus(type)
         : loader
@@ -66,10 +64,9 @@ export function getBus(type) {
           : null;
 
     if (!(bus instanceof Bus))
-      throw {
-        code: err.configFailed,
-        msg: type + i18n.t('消息总线未正确配置，可以在config/bus.js中指定')
-      };
+      throw new Error( err.configFailed,
+       type + i18n.t('消息总线未正确配置，可以在config/bus.js中指定')
+     );
 
     instance[type + 'Bus'] = bus;
   }

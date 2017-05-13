@@ -1,15 +1,18 @@
-import co from 'co';
-
 export default class Repository {
-  async get(name, id, ...props) {}
+  get(name, id, ...props) {}
 
-  async save(aggregate) {}
+  save(aggregate) {}
 
-  use(fn){
-    return co(fn).catch(this.rollback);
+  async use(fn) {
+    try {
+      return await fn();
+    } catch (err) {
+      this.rollback();
+      throw err;
+    }
   }
 
-  async commit() {}
+  commit() {}
 
-  async rollback() {}
+  rollback() {}
 }

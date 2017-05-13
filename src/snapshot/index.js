@@ -45,7 +45,7 @@ export function getStorage() {
   }
 
   if (!(storageInstance instanceof SnapshotStorage)) {
-    throw {code: err.configFailed, msg: '快照数据存储服务未正确配置，可以在config/snapshot.js中指定'};
+    throw new Error( err.configFailed,  '快照数据存储服务未正确配置，可以在config/snapshot.js中指定');
   }
   storage = storageInstance;
 
