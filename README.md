@@ -4,13 +4,16 @@
 
 定义为一个 Configurable 可配置、Extensible 可扩展、EventSourced 事件溯源、Object-oriented 面向对象 的CQRS框架。
 
+Introduction to CQRS
+https://www.codeproject.com/Articles/555855/Introduction-to-CQRS
+
 ## 安装：
 
 ```
 npm install cqrs-fx --save
 ```
 
-## 常规调用：
+## 使用：
 
 ```js
 import {App} from 'cqrs-fx';
@@ -259,7 +262,9 @@ new App({
 });
 ```
 
-自定义快照
+## 快照
+
+默认保存所有非跟对象属性，但是可以重写
 
 ```js
 export default class AdminAccount extends Account {
