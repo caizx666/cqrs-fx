@@ -1,46 +1,54 @@
-import * as snapshot from '../snapshot';
+import {getProvider as getSnapshotProvider} from '../snapshot';
 import aggregate from '../aggregate';
-import * as event from '../event';
-import {
-  isFunction,
-  isString
-} from '../utils';
-import * as bus from '../bus';
+import {getStorage as getEventStorage} from '../event';
+import {isFunction, isString} from '../utils';
+import err from '../err';
+import {getEventBus} from '../bus';
 import i18n from '../i18n';
 import Repository from './repository';
 
 export default class EventSourcedRepository extends Repository {
   _saveHash = []
 
-  createAggregate(name, id, props) {
-    let CLS = aggregate.get(name);
+  createAggregate(module, name, id, props) {
+    let CLS = aggregate.get(name, module);
     if (!CLS || !isFunction(CLS))
       return null;
     return new CLS(id, ...props);
   }
 
-  async get(name, id, ...props) {
-    if (!name || !id || !isString(name) || !isString(id)) return null;
-    let aggregateRoot = this.createAggregate(name, id, props);
-    if (!aggregateRoot) return null;
-    const snapshotProvider = snapshot.getProvider();
-    if (snapshotProvider && await snapshotProvider.hasSnapshot(name, id)) {
-      let snapshot = await snapshotProvider.getSnapshot(name, id);
+  async get(name, id, module, ...props) {
+    if (!name || !id || !isString(name) || !isString(id))
+      return null;
+    if (!isString(module)) {
+      const mn = name.split('/');
+      if (mn.length != 2) {
+        throw new Error(err.moduleNotExists, i18n.t('领域对象无法找到') + name);
+      }
+      module = mn[0];
+      name = mn[1];
+    }
+    let aggregateRoot = this.createAggregate(module, name, id, props);
+    if (!aggregateRoot)
+      return null;
+    const aggregateRootAlias = `${module}/domain/${name}`;
+    const snapshotProvider = getSnapshotProvider();
+    debugger
+    if (snapshotProvider && await snapshotProvider.hasSnapshot(aggregateRootAlias, id)) {
+      let snapshot = await snapshotProvider.getSnapshot(aggregateRootAlias, id);
       aggregateRoot.buildFromSnapshot(snapshot);
-      var eventsAfterSnapshot = await event.getStorage().loadEvents(name, id, snapshot.Version);
+      var eventsAfterSnapshot = await getEventStorage().loadEvents(aggregateRootAlias, id, snapshot.version);
       if (eventsAfterSnapshot && eventsAfterSnapshot.length > 0)
         aggregateRoot.buildFromHistory(eventsAfterSnapshot);
-    } else {
+      }
+    else {
       aggregateRoot.id = id;
-      let evnts = await event.getStorage().loadEvents(name, id);
-      if (evnts != null && evnts.Count() > 0)
+      let evnts = await getEventStorage().loadEvents(aggregateRootAlias, id);
+      if (evnts != null && evnts.length > 0)
         aggregateRoot.buildFromHistory(evnts);
       else
-        throw {
-          code: err.aggregateNotExists,
-          msg: i18n.t('领域对象未能在数据库中找到:') + `(id=${id})`
-        };
-    }
+        throw new Error(err.aggregateNotExists, i18n.t('领域对象未能在数据库中找到:') + `(id=${id})`);
+      }
     return aggregateRoot;
   }
 
@@ -51,7 +59,9 @@ export default class EventSourcedRepository extends Repository {
   }
 
   async commit() {
-    const snapshotProvider = snapshot.getProvider();
+    const snapshotProvider = getSnapshotProvider();
+    const eventStorage = getEventStorage();
+    const eventBus = getEventBus();
     for (let aggregateRoot of this._saveHash) {
       if (snapshotProvider && snapshotProvider.option == 'immediate') {
         if (await snapshotProvider.canCreateOrUpdateSnapshot(aggregateRoot)) {
@@ -60,21 +70,21 @@ export default class EventSourcedRepository extends Repository {
       }
       let events = aggregateRoot.uncommittedEvents;
       for (let evt of events) {
-        await event.getStorage().saveEvent(evt);
-        await bus.getEventBus().publish(evt);
+        await eventStorage.saveEvent(evt);
+        await eventBus.publish(evt);
       }
     }
     // todo 这里需要事务
-    await event.getStorage().commit();
-    await bus.getEventBus().commit();
+    await eventStorage.commit();
+    await eventBus.commit();
     if (snapshotProvider && snapshotProvider.option == 'immediate') {
       await snapshotProvider.commit();
     }
   }
 
   async rollback() {
-    await event.getStorage().Rollback();
-    const snapshotProvider = snapshot.getProvider();
+    await getEventStorage().Rollback();
+    const snapshotProvider = getSnapshotProvider();
     if (snapshotProvider && snapshotProvider.option == 'immediate') {
       await snapshotProvider.Rollback();
     }

@@ -14,7 +14,7 @@ export default class UserAccount extends Account {
     if (!password || password.length < 5) {
       throw Error('密码不能少于5位');
     }
-    let userAccount = new UserAccount;
+    const userAccount = new UserAccount;
     userAccount.raiseEvent('accountCreated', {
       userName,
       password,
@@ -47,7 +47,7 @@ export default class UserAccount extends Account {
     name,
     data
   }) {
-    console.log('when', name, JSON.stringify( data));
+    //console.log('when', name, JSON.stringify( data));
   }
 
   accountCreated({

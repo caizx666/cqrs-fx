@@ -1,7 +1,11 @@
 export default {
   // 默认值
-  type: 'direct',
-  // commandBus: 'direct',
-  eventBus: 'mq',
-  dispatcher: 'message_dipatcher'
+  dispatcher : 'message_dipatcher',
+  commandBus : 'direct',
+  eventBus : 'mq',
+  eventMQ : {
+    name: 'eventqueue',
+    port: 6379,
+    host: '127.0.0.1'
+  }
 };

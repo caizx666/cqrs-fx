@@ -4,35 +4,29 @@ import {isNumber} from '../utils';
 export default class EventStorage {
   _addList = [];
 
-  count(spec) {}
-
-  select(spec) {}
-
-  commit() {}
-
   insert({
     id,
-    eventname,
-    eventid,
-    sourceid,
+    name,
+    source_type,
+    source_id,
     timestamp,
     branch,
     version,
     ...data
   }) {
     assert(id);
-    assert(eventname);
-    assert(eventid);
-    assert(sourceid);
+    assert(name);
+    assert(source_type);
+    assert(source_id);
     assert(timestamp);
     assert(isNumber(branch));
-    assert(version);
+    assert(isNumber(version));
 
     this._addList.push({
       id,
-      eventname,
-      eventid,
-      sourceid,
+      name,
+      source_type,
+      source_id,
       timestamp,
       branch,
       version,

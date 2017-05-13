@@ -13,7 +13,7 @@ export default class MessageDispatcher extends Dispatcher {
   }
 
   // message = {name,module,type,data}
-  dispatch(message) {
+  async dispatch(message) {
     if (!message.name || !isString(message.name)) {
       log(i18n.t('消息name无效'));
       return;
@@ -41,7 +41,7 @@ export default class MessageDispatcher extends Dispatcher {
     }
     const handlers = this.getHandlers(message.type, module, name);
     let success = 0;
-    handlers.forEach(type => {
+    handlers.forEach(async(type) => {
       var CLS = _require(type);
       if (!CLS || !isFunction(CLS))
         return;
@@ -58,7 +58,8 @@ export default class MessageDispatcher extends Dispatcher {
       log(i18n.t('分发消息') + message.name);
       this._onDispatching(evt);
       try {
-        handler[name].call(handler, message.data || {});
+        const fn = handler[name].bind(handler);
+        await fn(message.data || {});
         this._onDispatched(evt);
         success++;
         log(i18n.t('分发消息') + message.name + i18n.t('完成'));

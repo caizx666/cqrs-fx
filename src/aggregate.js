@@ -37,6 +37,10 @@ export default class Aggregate {
     return this.__module;
   }
 
+  get alias(){
+    return this.__type;
+  }
+
   get id() {
     return this._id;
   }
@@ -149,6 +153,8 @@ export default class Aggregate {
       return;
     event.module = this.module;
     event.id = uuid.v1();
+    event.sourceId = this.id;
+    event.sourceAlias = this.__type;
     event.version = ++this._eventVersion;
     event.branch = DEFAULT_BRACH;
     event.timestamp = timestamp();

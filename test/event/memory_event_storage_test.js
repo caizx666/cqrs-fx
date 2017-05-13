@@ -1,24 +1,11 @@
 import {assert} from 'chai';
 
-import config from '../../src/config';
-import MongoEventStorage from '../../src/event/mongo_event_storage';
-import {MongoClient} from 'mongodb';
-
-config.init({
-  event: {
-    collection: 'events',
-    mongo: {
-      url: 'mongodb://localhost:27017/test'
-    }
-  }
-});
+import MemoryEventStorage from '../../src/event/memory_event_storage';
 
 describe('事件', function() {
-  it('事件可以存储到mongodb中并读取', async function() {
-    const store = new MongoEventStorage();
-    await store.drop();
-
-    let c = await store.count();
+  it('可以提交读取数据', function() {
+    const store = new MemoryEventStorage();
+    let c = store.count();
     assert.equal(c, 0);
 
     const t = new Date().getTime();
@@ -36,12 +23,12 @@ describe('事件', function() {
       }
     });
 
-    await store.commit();
+    store.commit();
 
-    c = await store.count()
+    c =  store.count()
     assert.equal(1, c);
 
-    let item = await store.select({id: 1});
+    let item =  store.select({id: 1});
     assert.equal(item.length, 1);
 
     item = item[0];
@@ -59,8 +46,6 @@ describe('事件', function() {
 
     assert.equal(item.data.a, 100);
     assert.equal(item.data.b, 'aaaaaaaaaaaaaaaaaaaaaa');
-
-    await store.drop();
 
   });
 });

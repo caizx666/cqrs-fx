@@ -9,7 +9,7 @@
     "watch": "babel  src --watch --out-dir lib  --source-maps",
     "test": "node node_modules/mocha/bin/mocha --compilers js:babel-core/register ",
     "test-all": "node node_modules/mocha/bin/mocha --compilers js:babel-core/register test/**/*_test.js",
-    "test-debug": "node-debug   --web-port=9900  node_modules/mocha/bin/_mocha   --compilers js:babel-core/register test/**/*_test.js"
+    "test-debug": "node-debug   --web-port=9900  node_modules/mocha/bin/_mocha   --compilers js:babel-core/register "
   },
   "keywords": [
     "cqrs",
@@ -23,6 +23,7 @@
   "license": "Apache License",
   "dependencies": {
     "assert": "^1.4.1",
+    "bull": "^2.2.6",
     "i18next": "^8.1.0",
     "mongodb": "^2.2.26",
     "mysql": "^2.13.0",

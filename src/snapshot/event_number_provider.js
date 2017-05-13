@@ -1,70 +1,69 @@
 import config from '../config';
 import err from '../err';
-import DomainEventStorage from '../event/domain_event_storage';
 import SnapshotProvider from './snapshot_provider';
-import uuid from 'uuid';
+import {getStorage as getSnapshotStorage} from './index';
+import {getStorage as getEventStorage} from '../event';
+import {uuid} from '../utils';
 
-export default class EventNumberProvider extends SnapshotProvider{
-  constructor(snapshotStorage) {
+export default class EventNumberProvider extends SnapshotProvider {
+  constructor() {
     super();
     let snapshotConfig = config.get('snapshot');
 
     this.option = snapshotConfig.option;
     this.numOfEvents = snapshotConfig.numberOfEvents;
 
-    this.snapshotStorage = snapshotStorage;
-    this.eventStorage = new DomainEventStorage();
+    this.snapshotStorage = getSnapshotStorage();
+    this.eventStorage = getEventStorage();
 
     this._snapshotMapping = new Map();
   }
 
   async hasSnapshot(name, id) {
-    if (!name || !id) return false;
+    if (!name || !id)
+      return false;
     var key = name + '/' + id;
-    if (this._snapshotMapping.keys().indexOf(key) > -1)
+    if (this._snapshotMapping.has(key))
       return true;
-    let snapshotRecordCnt = await this.snapshotStorage.count({
-      aggregate_root_type: name,
-      aggregate_root_id: id
-    });
+    let snapshotRecordCnt = await this.snapshotStorage.count({aggregate_root_type: name, aggregate_root_id: id});
     if (snapshotRecordCnt > 0)
       return true;
     else
       return false;
-  }
+    }
 
-  async getSnapshot(name, id) {
-    if (!name || !id) return null;
-    var key = name + '/' + id;
-    if (this._snapshotMapping.keys().indexOf(key) > -1)
+  async getSnapshot(aggregateRootAlias, id) {
+    if (!aggregateRootAlias || !id)
+      return null;
+    var key = aggregateRootAlias + '/' + id;
+    if (this._snapshotMapping.has(key))
       return this._snapshotMapping[key];
-    let dataObj = await this.snapshotStorage.first({
-      aggregate_root_type: name,
-      aggregate_root_id: id
-    });
+    let dataObj = await this.snapshotStorage.first({aggregate_root_type: aggregateRootAlias, aggregate_root_id: id});
     if (dataObj == null)
       return null;
-    let snapshot = Object.assgin(JSON.parse(dataObj.data), {
+    let snapshot = {
+      ...dataObj.data,
       id: dataObj.aggregateRootID,
       branch: dataObj.branch,
       version: dataObj.version,
       timestamp: dataObj.timestamp
-    });
+    };
     this._snapshotMapping.set(key, snapshot);
     return snapshot;
   }
 
   async canCreateOrUpdateSnapshot(aggregateRoot) {
-    if (!aggregateRoot || !aggregateRoot.prototype.__type || !aggregateRoot.id) return false;
-    if (await this.hasSnapshot(aggregateRoot.prototype.__type, aggregateRoot.id)) {
-      let snapshot = await this.getSnapshot(aggregateRoot.prototype.__type, aggregateRoot.id);
+    if (!aggregateRoot || !aggregateRoot.alias || !aggregateRoot.id)
+      return false;
+    if (await this.hasSnapshot(aggregateRoot.alias, aggregateRoot.id)) {
+      let snapshot = await this.getSnapshot(aggregateRoot.alias, aggregateRoot.id);
       return snapshot.version + this.numOfEvents <= aggregateRoot.version;
     } else {
-      let aggregateRootType = aggregateRoot.prototype.__type;
+      let aggregateRootAlias = aggregateRoot.alias;
       let aggregateRootID = aggregateRoot.id;
       let version = aggregateRoot.version;
       let eventCnt = await this.eventStorage.count({
-        aggregate_root_type: aggregateRootType,
+        aggregate_root_type: aggregateRootAlias,
         aggregate_root_id: aggregateRootID,
         version: ['<=', version]
       });
@@ -73,22 +72,23 @@ export default class EventNumberProvider extends SnapshotProvider{
   }
 
   async createOrUpdateSnapshot(aggregateRoot) {
-    if (!aggregateRoot || !aggregateRoot.prototype.__type || !aggregateRoot.id) return;
+    if (!aggregateRoot || !aggregateRoot.alias || !aggregateRoot.id)
+      return;
     let snapshot = aggregateRoot.createSnapshot();
     let dataObj = {
-      aggregateRootID: aggregateRoot.id,
-      aggregateRootType: aggregateRoot.prototype.__name,
+      aggregate_root_id: aggregateRoot.id,
+      aggregate_root_type: aggregateRoot.alias,
       data: JSON.stringify(snapshot),
       version: aggregateRoot.version,
       branch: aggregateRoot.branch,
       timestamp: aggregateRoot.timestamp
     };
-    let key = aggregateRoot.prototype.__type + '/' + aggregateRoot.id;
-    if (await this.hasSnapshot(aggregateRoot.prototype.__type, aggregateRoot.id)) {
-      let aggregateRootType = aggregateRoot.prototype.__type;
+    let key = aggregateRoot.alias + '/' + aggregateRoot.id;
+    if (await this.hasSnapshot(aggregateRoot.alias, aggregateRoot.id)) {
+      let aggregateRootAlias = aggregateRoot.alias;
       let aggregateRootID = aggregateRoot.id;
       await this.snapshotStorage.update(dataObj, {
-        aggregate_root_type: aggregateRootType,
+        aggregate_root_type: aggregateRootAlias,
         aggregate_root_id: aggregateRootID
       });
       this._snapshotMapping.set(key, snapshot);

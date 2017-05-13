@@ -6,7 +6,15 @@ import path from 'path';
 import config from '../../src/config';
 
 config.init({
+  bus: {
+    commandBus: 'direct',
+    eventBus: 'direct'
+  },
+  event: {
+    storage: 'memory_domain_event'
+  },
   snapshot: {
+    storage: 'memory',
     numberOfEvents: 2
   }
 });
@@ -17,14 +25,14 @@ describe('事件仓库', function() {
     fxData.alias['module1/domain/UserAccount'] = path.normalize(__dirname + '/../../demo/module1/domain/UserAccount.js');
 
     const rep = new EventSourcedRepository();
-    const agg = Aggregate.get('UserAccount').create({userName: 'user1', password: '123456', displayName: '张三'});
+    const agg = Aggregate.get('module1/UserAccount').create({userName: 'user1', password: '123456', displayName: '张三'});
     rep.save(agg);
     await rep.commit();
 
-    const obj = await rep.get('UserAccount', agg.id);
-    assert(obj.userName == agg.userName);
-    assert(obj.password == agg.password);
-    assert(obj.displayName == agg.displayName);
+    const obj = await rep.get('module1/UserAccount', agg.id);
+    assert.equal(obj.userName, agg.userName);
+    assert.equal(obj.password, agg.password);
+    assert.equal(obj.displayName, agg.displayName);
 
   });
 
@@ -33,7 +41,7 @@ describe('事件仓库', function() {
     fxData.alias['module1/domain/UserAccount'] = path.normalize(__dirname + '/../../demo/module1/domain/UserAccount.js');
 
     const rep = new EventSourcedRepository();
-    const agg = Aggregate.get('UserAccount').create({userName: 'user1', password: '123456', displayName: '张三'});
+    const agg = Aggregate.get('module1/UserAccount').create({userName: 'user1', password: '123456', displayName: '张三'});
 
     agg.updateAddress('地址1');
     agg.updateEmail('email1');
@@ -45,10 +53,10 @@ describe('事件仓库', function() {
 
     await rep.commit();
 
-    const obj = await rep.get('UserAccount', agg.id);
-    assert(obj.userName == agg.userName);
-    assert(obj.contactAddress == '地址2');
-    assert(obj.email == 'email2');
+    const obj = await rep.get('module1/UserAccount', agg.id);
+    assert.equal(obj.userName, agg.userName);
+    assert.equal(obj.contactAddress, '地址2');
+    assert.equal(obj.email, 'email2');
 
     obj.updateAddress('地址1');
     obj.updateEmail('email1');
@@ -56,10 +64,10 @@ describe('事件仓库', function() {
     rep.save(obj);
     await rep.commit();
 
-    const obj2 = await rep.get('UserAccount', agg.id);
-    assert(obj2.userName == agg.userName);
-    assert(obj2.contactAddress == '地址1');
-    assert(obj2.email == 'email1');
+    const obj2 = await rep.get('module1/UserAccount', agg.id);
+    assert.equal(obj2.userName, agg.userName);
+    assert.equal(obj2.contactAddress, '地址1');
+    assert.equal(obj2.email, 'email1');
 
   });
 });

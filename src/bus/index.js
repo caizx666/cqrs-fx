@@ -1,13 +1,13 @@
 import assert from 'assert';
-
-import config from '../config';
-import mqbus from './mq_bus';
-import directbus from './direct_bus';
-import MessageDispatcher from './message_dispatcher';
 import err from '../err';
 import i18n from '../i18n';
-import Dispatcher from './dispatcher';
+import config from '../config';
 import Bus from './bus';
+import Dispatcher from './dispatcher';
+import mqbus from './mq_bus';
+import mqworker from './mq_worker';
+import directbus from './direct_bus';
+import MessageDispatcher from './message_dispatcher';
 
 const instance = {};
 
@@ -93,7 +93,7 @@ export async function publish(type, ...messages) {
     msgs.push({module: messages[0], name: message[1], data: message[2]});
   } else if (messages.length == 2 && typeof messages[0] === 'string') {
     const mn = messages[0].split('/');
-    if (mn.length != 2){
+    if (mn.length != 2) {
       throw new Error(i18n.t('消息name需要包含module/name信息'));
     }
     msgs.push({module: mn[0], name: mn[1], data: message[1]});
@@ -112,4 +112,11 @@ export async function publishEvent(...messages) {
 
 export async function publishCommand(...messages) {
   await publish('command', ...messages);
+}
+
+export function getWorker() {
+  if (instance.mqworker) {
+    return instance.mqworker;
+  }
+  return instance.mqworker = new mqworker;
 }
