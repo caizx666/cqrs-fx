@@ -140,11 +140,11 @@ export default class UserAccount extends Account {
 import {CommandHandler} from 'cqrs-fx';
 
 export default class AccountCommandHandler extends CommandHandler {
-  createAccount(message) {
-    this.repository.use(() => {
+  async createAccount(message) {
+    this.repository.use(async() => {
       const userAccount = this.getAggregate('UserAccount').create(message);
-      this.repository.save(userAccount);
-      this.repository.commit();
+      await this.repository.save(userAccount);
+      await this.repository.commit();
     });
   }
 
