@@ -1,17 +1,15 @@
-import co from 'co';
-import * as repository from '../repository';
-import {
-  isString
-} from '../utils';
+import {isString} from '../utils';
 import i18n from '../i18n';
 import Bus from './bus';
+import * as bus from './index';
+import * as repository from '../repository';
 
 export default class DirectBus extends Bus {
-  constructor(type, dispatcher) {
+  constructor() {
     super();
     this.messageQueue = [];
-    this.type = type;
-    this.dispatcher = dispatcher;
+    this.dispatcher = bus.getDispatcher(this.type);
+    this.repository = repository.getRepository();
   }
 
   publish(...messages) {
@@ -37,14 +35,9 @@ export default class DirectBus extends Bus {
 
   async commit() {
     this.messageQueue.forEach(msg => {
-      this.dispatcher.dispatch({
-        type: this.type,
-        name: msg.name,
-        data: msg.data
-      });
+      this.dispatcher.dispatch({type: this.type, name: msg.name, data: msg.data});
     });
-    const rep = repository.getRepository();
-    await rep.commit();
+    await this.repository.commit();
     this.messageQueue.length = 0;
   }
 

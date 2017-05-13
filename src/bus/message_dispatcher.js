@@ -9,22 +9,37 @@ export default class MessageDispatcher extends Dispatcher {
   _dispatchedListeners = []
 
   getHandlers(type, module, name) {
-    console.log(Object.keys(fxData.alias) , type, module, name)
-    return Object.keys(fxData.alias).filter(item => item.startsWith(`${module}/${type}/`))
-      .map(alias => _require(alias))
-      .filter(item => isFunction(item.prototype[name]));
+    return Object.keys(fxData.alias).filter(item => item.startsWith(`${module}/${type}/`)).map(alias => _require(alias)).filter(item => isFunction(item.prototype[name]));
   }
 
-  // message = {name,type,data}
+  // message = {name,module,type,data}
   dispatch(message) {
-    if (!isString(message.name) || !isString(message.module) || !isString(message.type) ||
-      (message.type != 'event' && message.type != 'command')) {
-      log(i18n.t('消息无效'));
+    if (!message.name || !isString(message.name)) {
+      log(i18n.t('消息name无效'));
+      return;
+    }
+    if (message.type !== 'event' && message.type !== 'command') {
+      log(i18n.t('消息type无效'));
       return;
     }
 
-    this._onDispatching();
-    const handlers = this.getHandlers(message.type, message.module, message.name);
+    let module;
+    let name;
+    if (!message.module) {
+      const mn = message.name.split('/');
+      if (mn.length == 2) {
+        module = mn[0];
+        name = mn[1];
+      }
+    } else {
+      module = message.module;
+      name = message.name;
+    }
+    if (!module) {
+      log(i18n.t('消息module无效'));
+      return;
+    }
+    const handlers = this.getHandlers(message.type, module, name);
     let success = 0;
     handlers.forEach(type => {
       var CLS = _require(type);
@@ -33,8 +48,9 @@ export default class MessageDispatcher extends Dispatcher {
       var handler = new CLS();
       if (!handler || !isFunction(handler[name]))
         return;
-      let evt = {
-        message,
+      const evt = {
+        type: message.type,
+        data: message.data,
         module,
         name,
         handler
@@ -62,8 +78,8 @@ export default class MessageDispatcher extends Dispatcher {
   }
 
   addListener(dispatchingListener, dispatchedListener, dispatchFailedListener) {
-    if (isFunction(dispatchedListener))
-      this._dispatchingListeners.push(dispatchedListener);
+    if (isFunction(dispatchingListener))
+      this._dispatchingListeners.push(dispatchingListener);
     if (isFunction(dispatchedListener))
       this._dispatchedListeners.push(dispatchedListener);
     if (isFunction(dispatchFailedListener))
@@ -81,7 +97,7 @@ export default class MessageDispatcher extends Dispatcher {
   }
 
   _onDispatchFaild(event) {
-    this.dispatchFailedListener.forEach(listener => {
+    this._dispatchFailedListeners.forEach(listener => {
       try {
         listener(event);
       } catch (e) {
@@ -91,7 +107,7 @@ export default class MessageDispatcher extends Dispatcher {
   }
 
   _onDispatched(event) {
-    this.dispatchedListener.forEach(listener => {
+    this._dispatchedListeners.forEach(listener => {
       try {
         listener(event);
       } catch (e) {

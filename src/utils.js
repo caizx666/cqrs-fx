@@ -1,9 +1,6 @@
 import path from 'path';
 import fs from 'fs';
-import nuuid from 'uuid';
-export co from 'co';
-
-export const uuid = nuuid;
+export uuid from 'uuid';
 
 export const isFile = file => {
   return fs.statSync(file).isFile();

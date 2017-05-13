@@ -2,11 +2,12 @@ import * as repository from '../repository';
 import Aggregate from '../aggregate';
 
 export default class CommandHandler {
-  constructor(module) {
-    this.module = module;
+
+  get module() {
+    return this.__module;
   }
 
-  get repository(){
+  get repository() {
     return repository.getRepository();
   }
 
@@ -16,7 +17,4 @@ export default class CommandHandler {
     return Aggregate.get(name, module);
   }
 
-  run(message) {
-    return true;
-  }
 }

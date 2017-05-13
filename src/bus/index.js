@@ -53,16 +53,16 @@ export function getBus(type) {
   if (!instance[type + 'Bus']) {
     const busConfig = config.get('bus');
 
-    let busType = typeof(busConfig[type + 'Bus'] || busConfig.type) === 'function'
+    let loader = typeof(busConfig[type + 'Bus'] || busConfig.type) === 'function'
       ? (busConfig[type + 'Bus'] || busConfig.type)
       : null;
 
     var bus = (busConfig[type + 'Bus'] || busConfig.type) === 'mq'
       ? new mqbus()
       : (busConfig[type + 'Bus'] || busConfig.type) === 'direct'
-        ? new directbus(type, getDispatcher(type))
-        : busType
-          ? new busType(type, getDispatcher(type))
+        ? new directbus(type)
+        : loader
+          ? new loader(type)
           : null;
 
     if (!(bus instanceof Bus))

@@ -227,3 +227,23 @@ new App({
   }
 });
 ```
+
+自定义快照
+
+```js
+export default class AdminAccount extends Account {
+  ...
+   
+  doCreateSnapshot() {
+    return {userName: this.userName, password: this.password, displayName: this.displayName, email: this.email};
+  }
+
+  doBuildFromSnapshot({userName, password, displayName, email}) {
+    this.userName = userName;
+    this.password = password;
+    this.displayName = displayName;
+    this.email = email;
+    this.isAdmin = true;
+  }
+}
+```

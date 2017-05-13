@@ -1,11 +1,6 @@
-import {
-  fxData,
-  _require
-} from './core';
+import {fxData, _require} from './core';
 import err from './err';
-import {
-  timestamp
-} from './utils';
+import {timestamp, uuid, isFunction} from './utils';
 
 const DEFAULT_BRACH = 0;
 const DEFAULT_VERSION = 0;
@@ -17,15 +12,29 @@ export default class Aggregate {
     this._uncommittedEvents = [];
     this._eventVersion = this.version;
     this._domainEventHandlers = {};
-    this._id = id || null;
+    this._id = id || uuid.v1();
   }
 
   // 获取聚合根对象类型
   static get(name, module) {
-    if (!module) return null;
-    let alias = fxData.alias[`${module}/domain/${name}`];
-    if (!alias) return null;
-    return _require(alias);
+    if (!name) {
+      return null;
+    }
+    if (!module) {
+      const mn = name.split('/');
+      if (mn.length == 2) {
+        module = mn[0];
+        name = mn[1];
+      }
+      if (!module) {
+        return null;
+      }
+    }
+    return _require(`${module}/domain/${name}`);
+  }
+
+  get module() {
+    return this.__module;
   }
 
   get id() {
@@ -49,8 +58,7 @@ export default class Aggregate {
   }
 
   buildFromHistory(...historicalEvents) {
-    if (this._uncommittedEvents.Count() > 0)
-      this._uncommittedEvents.Clear();
+    this._uncommittedEvents.length = 0;
     for (let de of historicalEvents)
       this._handleEvent(de);
     this._version = historicalEvents[historicalEvents.length - 1].version;
@@ -61,60 +69,67 @@ export default class Aggregate {
     if (this._domainEventHandlers[eventname])
       return this._domainEventHandlers[eventname];
     let handlers = [];
-    if (typeof this[eventname] == 'function') {
-      handlers.push(this[eventname]);
+    if (isFunction(this[eventname])) {
+      handlers.push(this[eventname].bind(this));
     }
-    // todo send to event bus？
     this._domainEventHandlers[eventname] = handlers;
     return handlers;
   }
 
   _handleEvent(event) {
-    let handlers = this._getDomainEventHandlers(event.name);
-    this.when(event);
-    for (var handler of handlers) {
-      handler(event.data);
+    if (event.module != this.module) {
+      return;
     }
-  }
-
-  when(event) {
-    // todo overlaod
+    let handlers = this._getDomainEventHandlers(event.name);
+    if (isFunction(this.when)) {
+      this.when(event);
+    }
+    for (var handler of handlers) {
+      if (isFunction(handler)) {
+        handler(event.data);
+      }
+    }
   }
 
   buildFromSnapshot(snapshot) {
     this._branch = snapshot.branch;
     this._version = snapshot.version;
     this._id = snapshot.aggregateRootID;
-    if (this.doBuildFromSnapshot)
+    if (isFunction(this.doBuildFromSnapshot))
       this.doBuildFromSnapshot(snapshot);
     else {
-      for (var p in snapshot) {
-        let item = snapshot[p];
-        if (typeof item === 'function')
-          continue;
-        if (!this.hasOwnProperty(p))
-          continue;
-        this[p] = item;
+      const {
+        branch,
+        version,
+        timestamp,
+        aggregateRootID,
+        ...data
+      } = snapshot;
+      for (const p in data) {
+        this[p] = data[p];
       }
     }
-    this._uncommittedEvents.clear();
+    this._uncommittedEvents.length = 0;
   }
 
   createSnapshot() {
-    let snapshot = {};
-    if (this.doCreateSnapshot) {
-      snapshot = this.doCreateSnapshot();
+    let snapshot;
+    if (isFunction(this.doCreateSnapshot)) {
+      snapshot = this.doCreateSnapshot() || {};
     } else {
-      for (var p in this) {
-        let item = this[p];
-        if (typeof item === 'function')
-          continue;
-        snapshot[p] = item;
-      }
+      const {
+        _version,
+        _branch,
+        _uncommittedEvents,
+        _eventVersion,
+        _domainEventHandlers,
+        _id,
+        ...data
+      } = this;
+      snapshot = data;
     }
-    snapshot = snapshot || {};
-    snapshot.branch = this._branch;
-    snapshot.version = this._version;
+    snapshot.branch = this.branch;
+    snapshot.version = this.version;
     snapshot.timestamp = timestamp();
     snapshot.aggregateRootID = this._id;
     return snapshot;
@@ -132,11 +147,12 @@ export default class Aggregate {
     }
     if (!event || !event.name)
       return;
+    event.module = this.module;
     event.id = uuid.v1();
     event.version = ++this._eventVersion;
     event.branch = DEFAULT_BRACH;
     event.timestamp = timestamp();
     this._handleEvent(event);
-    this._uncommittedEvents().push(event);
+    this._uncommittedEvents.push(event);
   }
 }

@@ -1,4 +1,4 @@
-import {CommandHandler} from '../../../../src';
+import {CommandHandler} from '../../../src';
 
 export default class AccountCommandHandler extends CommandHandler {
   async createAccount(message) {

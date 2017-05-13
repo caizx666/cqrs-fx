@@ -40,10 +40,11 @@ export function alias(type, paths) {
   });
 }
 
-let _loadRequire = (name, filepath) => {
+let _loadRequire = (name, filepath, module) => {
   let obj = safeRequire(filepath);
   if (isFunction(obj)) {
     obj.prototype.__type = name;
+    obj.prototype.__module = module;
     obj.prototype.__filename = filepath;
   }
   if (obj) {
@@ -78,7 +79,7 @@ export function _require(name, flag) {
   }
   // 默认从文件加载
   if (isString(filepath)) {
-    return _loadRequire(name, normalize(filepath));
+    return _loadRequire(name, normalize(filepath), name.split('/')[0]);
   }
   // only check in alias
   if (flag) {

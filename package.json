@@ -7,7 +7,7 @@
     "compile": "babel src --out-dir lib",
     "prepublish": "npm run compile",
     "watch": "babel  src --watch --out-dir lib  --source-maps",
-    "test": "node node_modules/mocha/bin/mocha --compilers js:babel-core/register",
+    "test": "node node_modules/mocha/bin/mocha --compilers js:babel-core/register ",
     "test-all": "node node_modules/mocha/bin/mocha --compilers js:babel-core/register test/**/*_test.js",
     "test-debug": "node-debug   --web-port=9900  node_modules/mocha/bin/_mocha   --compilers js:babel-core/register test/**/*_test.js"
   },
@@ -23,7 +23,6 @@
   "license": "Apache License",
   "dependencies": {
     "assert": "^1.4.1",
-    "co": "^4.6.0",
     "i18next": "^8.1.0",
     "mongodb": "^2.2.26",
     "mysql": "^2.13.0",
@@ -31,7 +30,8 @@
     "uuid": "^3.0.1"
   },
   "devDependencies": {
-    "babel-core": "^6.7.2",
+    "babel-cli": "^6.24.1",
+    "babel-core": "^6.24.1",
     "babel-loader": "^6.2.4",
     "babel-plugin-transform-runtime": "^6.9.0",
     "babel-preset-es2015": "^6.5.0",
