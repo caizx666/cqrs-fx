@@ -5,12 +5,8 @@ import path from 'path';
 
 import config from '../../src/config';
 
-
-
 describe('Bus', function() {
   it('发送命令同步执行', function() {
-
-
 
     bus.publishCommand({
       name: 'do1',
@@ -48,6 +44,8 @@ describe('Bus', function() {
         enable: true
       }
     });
+
+    console.log(bus.getCommandDispatcher()._handlers)
 
     bus.publishCommand({
       name: 'module1/createAccount',

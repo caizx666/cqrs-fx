@@ -13,7 +13,7 @@ export default class MessageDispatcher extends Dispatcher {
   _handlers = {};
 
   createAndRegisterAlias() {
-    Object.keys(fxData.alias).filter(item => item.indexOf(`/${this.type}/`) > -1).map(alias => _require(alias)).forEach((type)=>this.registerHandler(type));
+    Object.keys(fxData.alias).filter(item => item.indexOf(`/${this.type}/`) > -1).map(alias => _require(alias)).forEach((type) => this.registerHandler(type));
   }
 
   getHandlers(name, module) {
@@ -36,22 +36,24 @@ export default class MessageDispatcher extends Dispatcher {
       };
     }
     for (const p of Object.getOwnPropertyNames(handlerType.prototype)) {
-      if (p === 'constructor'){
+      if (p === 'constructor') {
         continue;
       }
-      if (!isFunction(handlerType.prototype[p])){
+      if (!isFunction(handlerType.prototype[p])) {
         continue;
       }
       const {
         module = ctoken.module,
-        name =p
+        name = p
       } = getDecoratorToken(handlerType.prototype[p]);
       if (module && name) {
         let items = this._handlers[`${module}/${name}`];
         if (!items) {
           this._handlers[`${module}/${name}`] = items = [];
         }
-        items.push({CLS: handlerType, method: p});
+        if (!items.find(item => item.CLS.name == handlerType.name && item.method == p)) {
+          items.push({CLS: handlerType, method: p});
+        }
       }
     }
   }
@@ -109,7 +111,7 @@ export default class MessageDispatcher extends Dispatcher {
       log(i18n.t('消息module无效'));
       return;
     }
-    const handlers = this.getHandlers(module, name);
+    const handlers = this.getHandlers(name, module);
     if (!handlers || handlers.length <= 0) {
       log(i18n.t('无消息处理器'));
     }
