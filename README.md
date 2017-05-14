@@ -306,3 +306,21 @@ export default class AdminAccount extends Account {
   }
 }
 ```
+
+## 异常处理
+
+command执行不管成功或失败都不会返回任何结果，我们通常挂接MessageDispatcher的事件处理，客户端监听到某个command结果后继续执行。
+
+```js
+
+  bus.getCommandDispatcher().addListener(null, ({module, name})=>{
+     // send success
+   }, {{module, name, error})=>{
+     // send fail
+   });
+
+```
+
+## 查询
+
+查询结果需要在EventHandler中保存到数据库中，查询直接查找即可
