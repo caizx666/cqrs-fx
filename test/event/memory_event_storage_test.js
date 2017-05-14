@@ -2,7 +2,7 @@ import {assert} from 'chai';
 
 import MemoryEventStorage from '../../src/event/memory_event_storage';
 
-describe('事件', function() {
+describe('MemoryEventStorage', function() {
   it('可以提交读取数据', function() {
     const store = new MemoryEventStorage();
     let c = store.count();
@@ -11,7 +11,8 @@ describe('事件', function() {
     const t = new Date().getTime();
     store.insert({
       id: 1,
-      event_name: 'xxxx',
+      name: 'xxxx',
+      module: 'mm',
       source_type: 'aaa/bbb/ccc',
       source_id: '1000222-sssssss-eeee-fffffe-333-444',
       timestamp: t,
@@ -35,7 +36,7 @@ describe('事件', function() {
     assert(item);
 
     assert.equal(item.id, 1);
-    assert.equal(item.event_name, 'xxxx');
+    assert.equal(item.name, 'xxxx');
     assert.equal(item.source_type, 'aaa/bbb/ccc');
     assert.equal(item.source_id, '1000222-sssssss-eeee-fffffe-333-444');
     assert.equal(item.timestamp, t);

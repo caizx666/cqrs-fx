@@ -4,17 +4,19 @@ import config from '../../src/config';
 import MongoEventStorage from '../../src/event/mongo_event_storage';
 import {MongoClient} from 'mongodb';
 
-config.init({
-  event: {
-    collection: 'events',
-    mongo: {
-      url: 'mongodb://localhost:27017/test'
-    }
-  }
-});
 
-describe('事件', function() {
+
+describe('MongoEventStorage', function() {
   it('事件可以存储到mongodb中并读取', async function() {
+    config.init({
+      event: {
+        collection: 'events',
+        mongo: {
+          url: 'mongodb://localhost:27017/test'
+        }
+      }
+    });
+
     const store = new MongoEventStorage();
     await store.drop();
 
@@ -24,7 +26,8 @@ describe('事件', function() {
     const t = new Date().getTime();
     store.insert({
       id: 1,
-      event_name: 'xxxx',
+      name: 'xxxx',
+      module: 'mm',
       source_type: 'aaa/bbb/ccc',
       source_id: '1000222-sssssss-eeee-fffffe-333-444',
       timestamp: t,
@@ -48,7 +51,7 @@ describe('事件', function() {
     assert(item);
 
     assert.equal(item.id, 1);
-    assert.equal(item.event_name, 'xxxx');
+    assert.equal(item.name, 'xxxx');
     assert.equal(item.source_type, 'aaa/bbb/ccc');
     assert.equal(item.source_id, '1000222-sssssss-eeee-fffffe-333-444');
     assert.equal(item.timestamp, t);

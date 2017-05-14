@@ -12,6 +12,7 @@ import {
     options = options || {};
     this.configPath = options.configPath;
     this.appPath = options.appPath;
+    this.configCache = {};
     this.initConfig = Object.assign({}, options);
   }
 

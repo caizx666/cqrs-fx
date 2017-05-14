@@ -8,12 +8,11 @@ import mqbus from './mq_bus';
 import mqworker from './mq_worker';
 import directbus from './direct_bus';
 import MessageDispatcher from './message_dispatcher';
-
-const instance = {};
+import {fxData} from '../core';
 
 export function getDispatcher(type) {
   assert(type === 'command' || type === 'event');
-  if (!instance[type + 'Dispatcher']) {
+  if (!fxData.container[type + 'Dispatcher']) {
 
     const busConfig = config.get('bus');
 
@@ -32,10 +31,10 @@ export function getDispatcher(type) {
     if (!(dispatcher instanceof Dispatcher)) {
       throw new Error(err.configFailed, type + i18n.t('消息分发器未正确配置，可以在config/bus.js中指定'));
     }
-    instance[type + 'Dispatcher'] = dispatcher;
+    fxData.container[type + 'Dispatcher'] = dispatcher;
   }
 
-  return instance[type + 'Dispatcher'];
+  return fxData.container[type + 'Dispatcher'];
 }
 
 export function getEventDispatcher() {
@@ -48,7 +47,7 @@ export function getCommandDispatcher() {
 
 export function getBus(type) {
   assert(type === 'command' || type === 'event');
-  if (!instance[type + 'Bus']) {
+  if (!fxData.container[type + 'Bus']) {
     const busConfig = config.get('bus');
 
     let loader = typeof(busConfig[type + 'Bus'] || busConfig.type) === 'function'
@@ -68,10 +67,10 @@ export function getBus(type) {
        type + i18n.t('消息总线未正确配置，可以在config/bus.js中指定')
      );
 
-    instance[type + 'Bus'] = bus;
+    fxData.container[type + 'Bus'] = bus;
   }
 
-  return instance[type + 'Bus'];
+  return fxData.container[type + 'Bus'];
 }
 
 export function getEventBus() {
@@ -112,8 +111,8 @@ export async function publishCommand(...messages) {
 }
 
 export function getWorker() {
-  if (instance.mqworker) {
-    return instance.mqworker;
+  if (fxData.container.mqworker) {
+    return fxData.container.mqworker;
   }
-  return instance.mqworker = new mqworker;
+  return fxData.container.mqworker = new mqworker;
 }

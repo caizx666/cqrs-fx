@@ -8,14 +8,12 @@ import MongoSnapshotStorage from './mongo_snapshot_storage';
 import MySqlSnapshotStorage from './mysql_snapshot_storage';
 import RedisSnapshotStorage from './redis_snapshot_storage';
 import MemorySnapshotStorage from './memory_snapshot_storage';
-
-let provider;
-let storage;
+import {fxData} from '../core';
 
 export function getStorage() {
 
-  if (storage) {
-    return storage;
+  if (fxData.container.snapshotStorage) {
+    return fxData.container.snapshotStorage;
   }
 
   const snapshotConfig = config.get('snapshot');
@@ -47,14 +45,14 @@ export function getStorage() {
   if (!(storageInstance instanceof SnapshotStorage)) {
     throw new Error( err.configFailed,  '快照数据存储服务未正确配置，可以在config/snapshot.js中指定');
   }
-  storage = storageInstance;
+  fxData.container.snapshotStorage = storageInstance;
 
   return storageInstance;
 }
 
 export function getProvider() {
-  if (provider) {
-    return provider;
+  if (fxData.container.snapshot) {
+    return fxData.container.snapshot;
   }
 
   const snapshotConfig = config.get('snapshot');
@@ -73,7 +71,7 @@ export function getProvider() {
     throw Error(err.configFailed, i18n.t('快照提供服务未正确配置，可以在config/snapshot.js中指定'));
   }
 
-  provider = snapshotInstance;
+  fxData.container.snapshot = snapshotInstance;
 
-  return provider;
+  return snapshotInstance;
 }

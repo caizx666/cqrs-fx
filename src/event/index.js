@@ -6,13 +6,12 @@ import MemoryEventStorage from './memory_event_storage';
 import config from '../config';
 import err from '../err';
 import i18n from '../i18n';
-
-let eventStorage;
+import {fxData} from '../core';
 
 export function getStorage(name) {
 
-  if (eventStorage) {
-    return eventStorage;
+  if (fxData.container.eventStorage) {
+    return fxData.container.eventStorage;
   }
 
   const evtConfig = config.get('event');
@@ -49,7 +48,7 @@ export function getStorage(name) {
   if (!(storage instanceof EventStorage))
     throw Error(err.configFailed, i18n.t('事件仓库未正确配置，可以在config/event中配置'));
 
-  eventStorage = storage;
+  fxData.container.eventStorage = storage;
 
   return storage;
 }

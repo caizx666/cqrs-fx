@@ -11,7 +11,8 @@ import {
 
 export const fxData = {
   alias: {},
-  export: {}
+  export: {},
+  container:{}
 };
 
 export function alias(type, paths) {

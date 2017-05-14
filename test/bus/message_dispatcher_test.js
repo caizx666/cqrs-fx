@@ -4,25 +4,28 @@ import {fxData} from '../../src/core';
 import path from 'path';
 import config from '../../src/config';
 
-config.init({
-  bus: {
-    commandBus: 'direct',
-    eventBus: 'direct'
-  },
-  event: {
-    storage: 'memory_domain_event'
-  },
-  snapshot: {
-    storage: 'memory'
-  }
-});
 
-describe('分发', function() {
+
+describe('MessageDispatcher', function() {
   it('同步分发', async function() {
     fxData.alias = {};
     fxData.alias['module1/command/AccountCommandHandler'] = path.normalize(__dirname + '/../../demo/module1/command/AccountCommandHandler.js');
     fxData.alias['module1/domain/AdminAccount'] = path.normalize(__dirname + '/../../demo/module1/domain/AdminAccount.js');
     fxData.alias['module1/domain/UserAccount'] = path.normalize(__dirname + '/../../demo/module1/domain/UserAccount.js');
+    fxData.container = {};
+
+    config.init({
+      bus: {
+        commandBus: 'direct',
+        eventBus: 'direct'
+      },
+      event: {
+        storage: 'memory_domain_event'
+      },
+      snapshot: {
+        storage: 'memory'
+      }
+    });
 
     const dispatcher = new MessageDispatcher('command');
     const listener = ({module, name, type, handler}) => {
@@ -34,7 +37,7 @@ describe('分发', function() {
 
     }
     dispatcher.addListener(listener, listener, listener);
- 
+
     assert.equal((await dispatcher.dispatch({
       name: 'module1/createAccount',
       type: 'command',

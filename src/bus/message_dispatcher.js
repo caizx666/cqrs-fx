@@ -63,16 +63,16 @@ export default class MessageDispatcher extends Dispatcher {
         name,
         handler
       };
-      log(this.type + i18n.t('分发消息') + message.name);
+      log(i18n.t('开始分发') + this.type + ':' + `${module}/${name}`);
       this._onDispatching(evt);
       try {
         await handler[name].bind(handler)(message.data || {});
         this._onDispatched(evt);
         success++;
-        log(this.type + i18n.t('分发消息') + message.name + i18n.t('完成'));
+        log(i18n.t('完成分发') + this.type + ':' + `${module}/${name}`);
       } catch (err) {
         evt.error = err;
-        log(this.type + i18n.t('分发消息') + message.name + i18n.t('失败，') + err);
+        log(i18n.t('失败分发') + this.type + ':' + `${module}/${name}` + ',' + err);
         this._onDispatchFaild(evt);
       }
     }

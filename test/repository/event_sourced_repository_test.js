@@ -5,24 +5,27 @@ import Aggregate from '../../src/aggregate';
 import path from 'path';
 import config from '../../src/config';
 
-config.init({
-  bus: {
-    commandBus: 'direct',
-    eventBus: 'direct'
-  },
-  event: {
-    storage: 'memory_domain_event'
-  },
-  snapshot: {
-    storage: 'memory',
-    numberOfEvents: 2
-  }
-});
 
-describe('事件仓库', function() {
+
+describe('EventSourcedRepository', function() {
   it('能保存并读取一个聚合对象', async function() {
     fxData.alias = {};
     fxData.alias['module1/domain/UserAccount'] = path.normalize(__dirname + '/../../demo/module1/domain/UserAccount.js');
+    fxData.container={};
+
+    config.init({
+      bus: {
+        commandBus: 'direct',
+        eventBus: 'direct'
+      },
+      event: {
+        storage: 'memory_domain_event'
+      },
+      snapshot: {
+        storage: 'memory',
+        numberOfEvents: 2
+      }
+    });
 
     const rep = new EventSourcedRepository();
     const agg = Aggregate.get('module1/UserAccount').create({userName: 'user1', password: '123456', displayName: '张三'});

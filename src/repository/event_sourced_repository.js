@@ -47,7 +47,7 @@ export default class EventSourcedRepository extends Repository {
       if (evnts != null && evnts.length > 0) {
         aggregateRoot.buildFromHistory(...evnts);
       } else {
-        log(i18n.t('领域对象未能在数据库中找到:') + `(id=${id})`);
+        log(i18n.t('领域对象未能在数据库中找到'));
         return null;
       }
     }

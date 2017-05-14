@@ -3,17 +3,18 @@ import {assert} from 'chai';
 import config from '../../src/config';
 import MongoSnapshotStorage from '../../src/snapshot/mongo_snapshot_storage';
 
-config.init({
-  snapshot: {
-    collection: 'snapshots',
-    mongo: {
-      url: 'mongodb://localhost:27017/test'
-    }
-  }
-});
 
-describe('快照', function() {
+
+describe('MongoSnapshotStorage', function() {
   it('快照可以存储到mongodb中并读取', async function() {
+    config.init({
+      snapshot: {
+        collection: 'snapshots',
+        mongo: {
+          url: 'mongodb://localhost:27017/test'
+        }
+      }
+    });
     const store = new MongoSnapshotStorage();
 
     await store.drop();

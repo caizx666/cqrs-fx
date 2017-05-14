@@ -1,5 +1,6 @@
 import path from 'path';
 import fs from 'fs';
+import config from './config';
 export uuid from 'uuid';
 
 export const isFile = file => {
@@ -9,7 +10,9 @@ export const isDir = file => {
   return fs.statSync(file).isDirectory();
 };
 export const log = msg => {
-  console.log(msg);
+  if (config.get('log').enable) {
+    console.log(msg);
+  }
 };
 export const sep = path.sep;
 export const normalize = path.normalize;
@@ -24,21 +27,21 @@ export function getDirs(file) {
   let files = fs.readdirSync(file);
   let dirs = [];
   for (var fi of files) {
-    if (fs.statSync(path.join(file,fi)).isDirectory())
+    if (fs.statSync(path.join(file, fi)).isDirectory())
       dirs.push(fi);
-  }
+    }
   return dirs;
 }
 
 export function getFiles(file) {
   let dirs = [];
-  if (fs.existsSync(file)){
+  if (fs.existsSync(file)) {
     let files = fs.readdirSync(file);
     for (var fi of files) {
-      if (fs.statSync(path.join(file,fi)).isFile())
+      if (fs.statSync(path.join(file, fi)).isFile())
         dirs.push(fi);
+      }
     }
-  }
   return dirs;
 }
 
@@ -73,13 +76,7 @@ export function timestamp() {
 }
 
 export function isArray(value) {
-  return (value instanceof Array ||
-    (!(value instanceof Object) &&
-      (Object.prototype.toString.call((value)) == '[object Array]') ||
-      typeof value.length == 'number' &&
-      typeof value.splice != 'undefined' &&
-      typeof value.propertyIsEnumerable != 'undefined' &&
-      !value.propertyIsEnumerable('splice')));
+  return (value instanceof Array || (!(value instanceof Object) && (Object.prototype.toString.call((value)) == '[object Array]') || typeof value.length == 'number' && typeof value.splice != 'undefined' && typeof value.propertyIsEnumerable != 'undefined' && !value.propertyIsEnumerable('splice')));
 }
 
 export function isFunction(func) {
@@ -98,8 +95,9 @@ export function isObject(txt) {
   return typeof txt === 'object';
 }
 
-let parseValue = function (exprArray, name, value, opt) {
-  if (value === null) return;
+let parseValue = function(exprArray, name, value, opt) {
+  if (value === null)
+    return;
   if (isString(value)) {
     exprArray.push(`${name}='${value}'`);
   } else if (isNumber(value)) {
@@ -123,12 +121,13 @@ export function expr(sepc) {
   return string.join(exprArray, ' and ');
 }
 
-export function merge(...args){
+export function merge(...args) {
   let obj = {};
-  for(let item of args){
-    if (!item) continue;
-    for(let p of item){
-      if (item.hasOwnProperty(p) && item[p]){
+  for (let item of args) {
+    if (!item)
+      continue;
+    for (let p of item) {
+      if (item.hasOwnProperty(p) && item[p]) {
         obj[p] = (obj[p] || []).concat(item[p]);
       }
     }

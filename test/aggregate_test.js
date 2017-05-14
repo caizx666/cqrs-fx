@@ -3,7 +3,7 @@ import path from 'path';
 import {Aggregate} from '../src';
 import {fxData} from '../src/core';
 
-describe('聚合对象', function() {
+describe('Aggregate', function() {
   it('加载并创建一个对象实例', function() {
     fxData.alias = {};
     fxData.alias['module1/domain/UserAccount'] = path.normalize(__dirname + '/../demo/module1/domain/UserAccount.js');

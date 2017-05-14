@@ -1,11 +1,7 @@
 import path from 'path';
 
 import config from './config';
-import {
-  fxData,
-  alias,
-  _require
-} from './core';
+import {fxData, alias, _require} from './core';
 import {
   safeRequire,
   log,
@@ -31,7 +27,7 @@ export default class App {
     command: 'command',
     config: 'config',
     event: 'event',
-    domain: 'domain',
+    domain: 'domain'
   }
 
   constructor(options) {
@@ -45,7 +41,8 @@ export default class App {
     let dir = path.join(config.appPath, name);
     if (isDir(dir)) {
       var dirs = getDirs(dir);
-      if (dirs.length <= 0) return; // 空模块
+      if (dirs.length <= 0)
+        return; // 空模块
       let isModule = false;
       for (let subdir of dirs) {
         if (this._types.indexOf(subdir) > -1) {
@@ -122,8 +119,10 @@ export default class App {
 
   clearData() {
     if (this._modules) {
+      // 只能有一个实例
       fxData.alias = {};
       fxData.export = {};
+      fxData.container = {};
     }
   }
 
@@ -141,13 +140,21 @@ export default class App {
     log('cqrs preload packages finished', 'PRELOAD', startTime);
   }
 
-  run(preload) {
+  run(...args) {
     this.clearData();
     this.load();
     this.autoReload();
-    if (preload) {
-      this.preload();
+    if (isFunction(args[0])) {
+      if (args[1]){
+        this.preload();
+      }
+      args[0](this);
+    } else {
+      if (args[0]) {
+        this.preload();
+      }
     }
+    return this;
   }
 
   publishCommand(...messages) {

@@ -3,13 +3,14 @@ import {assert} from 'chai';
 import DomainEventStorage from '../../src/event/domain_event_storage';
 import MemoryEventStorage from '../../src/event/memory_event_storage';
 
-describe('事件', function() {
+describe('DomainEventStorage', function() {
   it('可以保存加载领域事件', async function() {
     const store = new DomainEventStorage(new MemoryEventStorage());
 
     await store.saveEvent({
       id: 111,
       name: 'aaaaaaaaa',
+      module: 'mm',
       sourceId: 3343434,
       sourceAlias: 'a/domain/c',
       data: {},
@@ -20,6 +21,7 @@ describe('事件', function() {
 
     await store.saveEvent({
       id: 113,
+      module: 'mm',
       name: 'aaaaaaaaa',
       sourceId: 3343434,
       sourceAlias: 'a/domain/c',

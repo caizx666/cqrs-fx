@@ -3,7 +3,7 @@ import {assert} from 'chai';
 import MemorySnapshotStorage from '../../src/snapshot/memory_snapshot_storage';
 
 
-describe('快照', function() {
+describe('MemorySnapshotStorage', function() {
   it('快照可以存储到内存中并读取',  function() {
     const store = new MemorySnapshotStorage();
 
@@ -77,6 +77,6 @@ describe('快照', function() {
     assert(item);
     assert.equal(item.data.a, 10011);
 
-   
+
   });
 });

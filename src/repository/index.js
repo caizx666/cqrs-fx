@@ -3,12 +3,11 @@ import err from '../err';
 import i18n from '../i18n';
 import EventSourcedRepository from './event_sourced_repository';
 import Repository from './repository';
-
-let repository;
+import {fxData} from '../core';
 
 export function getRepository() {
-  if (repository) {
-    return repository;
+  if (fxData.container.repository) {
+    return fxData.container.repository;
   }
 
   const repConfig = config.get('repository')
@@ -24,7 +23,7 @@ export function getRepository() {
       i18n.t('领域仓库未正确配置，可以在config/repository.js中指定')
     );
 
-  repository = repInstance;
+  fxData.container.repository = repInstance;
 
-  return repository;
+  return repInstance;
 };
