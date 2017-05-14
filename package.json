@@ -1,8 +1,8 @@
 {
   "name": "cqrs-fx",
-  "version": "1.0.1",
-  "description": "cqrs framework",
-  "main": "index.js",
+  "version": "1.0.2",
+  "description": "基于nodejs的一个 Configurable 可配置、Extensible 可扩展、EventSourced 事件溯源、Object-oriented 面向对象 的CQRS框架。",
+  "main": "lib/index.js",
   "scripts": {
     "compile": "babel src --out-dir lib",
     "prepublish": "npm run compile",
@@ -13,7 +13,8 @@
   },
   "keywords": [
     "cqrs",
-    "saas-plat"
+    "saas-plat",
+    "nodejs"
   ],
   "repository": {
     "type": "git",
