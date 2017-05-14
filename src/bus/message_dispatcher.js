@@ -2,14 +2,79 @@ import {log, isFunction, isString} from '../utils';
 import {fxData, _require} from '../core';
 import i18n from '../i18n';
 import Dispatcher from './dispatcher';
+import {getDecoratorToken} from '../command/decorator';
+import assert from 'assert';
 
 export default class MessageDispatcher extends Dispatcher {
   _dispatchingListeners = []
   _dispatchFailedListeners = []
   _dispatchedListeners = []
 
-  getHandlers(module, name) {
-    return Object.keys(fxData.alias).filter(item => item.startsWith(`${module}/${this.type}/`)).map(alias => _require(alias)).filter(item => isFunction(item.prototype[name]));
+  _handlers = {};
+
+  createAndRegisterAlias() {
+    Object.keys(fxData.alias).filter(item => item.indexOf(`/${this.type}/`) > -1).map(alias => _require(alias)).forEach((type)=>this.registerHandler(type));
+  }
+
+  getHandlers(name, module) {
+    assert(name);
+    if (!module) {
+      const mn = name.split('/');
+      module = mn[0];
+      name = mn[1];
+    }
+    assert(module);
+    return this._handlers[`${module}/${name}`] || [];
+  }
+
+  registerHandler(handlerType) {
+    let ctoken = getDecoratorToken(handlerType);
+    if (!ctoken.name && !ctoken.module) {
+      ctoken = {
+        module: handlerType.prototype.__module,
+        name: handlerType.name
+      };
+    }
+    for (const p of Object.getOwnPropertyNames(handlerType.prototype)) {
+      if (p === 'constructor'){
+        continue;
+      }
+      if (!isFunction(handlerType.prototype[p])){
+        continue;
+      }
+      const {
+        module = ctoken.module,
+        name =p
+      } = getDecoratorToken(handlerType.prototype[p]);
+      if (module && name) {
+        let items = this._handlers[`${module}/${name}`];
+        if (!items) {
+          this._handlers[`${module}/${name}`] = items = [];
+        }
+        items.push({CLS: handlerType, method: p});
+      }
+    }
+  }
+
+  unregisterHandler(handler) {
+    const ctoken = getDecoratorToken(handlerType);
+    for (const p in handlerType.prototype) {
+      const {
+        module = ctoken.module,
+        name
+      } = getDecoratorToken(handlerType.prototype[p]);
+      if (module && name) {
+        let items = this._handlers[`${module}/${name}`];
+        if (!items) {
+          continue;
+        }
+        const item = items.find(item => item.CLS === handler);
+        if (!item) {
+          continue;
+        }
+        items.splice(items.indexOf(item), 1);
+      }
+    }
   }
 
   // message = {name,module,type,data}
@@ -48,14 +113,13 @@ export default class MessageDispatcher extends Dispatcher {
     if (!handlers || handlers.length <= 0) {
       log(i18n.t('无消息处理器'));
     }
-    let success = 0;
-    for (const type of handlers) {
-      var CLS = _require(type);
-      if (!CLS || !isFunction(CLS))
-        continue;
+    for (const {CLS, method}
+    of handlers) {
       var handler = new CLS();
-      if (!handler || !isFunction(handler[name]))
+      if (!isFunction(handler[method])) {
+        log(i18n.t('处理器无法执行命令'));
         continue;
+      }
       const evt = {
         type: message.type,
         data: message.data,
@@ -63,20 +127,18 @@ export default class MessageDispatcher extends Dispatcher {
         name,
         handler
       };
-      log(i18n.t('开始分发') + this.type + ':' + `${module}/${name}`);
+      log(i18n.t('开始执行') + this.type + ':' + `${module}/${name}`);
       this._onDispatching(evt);
       try {
-        await handler[name].bind(handler)(message.data || {});
+        await handler[method].bind(handler)(message.data || {});
         this._onDispatched(evt);
-        success++;
-        log(i18n.t('完成分发') + this.type + ':' + `${module}/${name}`);
+        log(i18n.t('完成执行') + this.type + ':' + `${module}/${name}`);
       } catch (err) {
         evt.error = err;
-        log(i18n.t('失败分发') + this.type + ':' + `${module}/${name}` + ',' + err);
+        log(i18n.t('失败执行') + this.type + ':' + `${module}/${name}` + ',' + err);
         this._onDispatchFaild(evt);
       }
     }
-    return success;
   }
 
   clear() {

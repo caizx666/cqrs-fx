@@ -40,7 +40,7 @@ cqrs.publishCommand('createAccount',
 
 ** App不要创建多个实例，整个系统都是单例的 **
 
-## 使用：
+## 开发：
 
 模块采用面向对象的开发
 
@@ -173,6 +173,24 @@ export default class AccountEventHandler extends EventHandler {
 
   accountDeleted({userName}){
     db.query('delete from AccountTable where id = ?userName', {userName})
+  }
+}
+```
+
+处理其他模块的事件可以用command或event装饰器实现
+
+```js
+import {command,event} from 'cqrs-fx';
+
+export default class AccountCommandHandler2 extends CommandHandler {
+  @command('module1/createAccount')
+  createAccount2(message) {
+    console.log('AccountCommandHandler2 createAccount2 ok');
+  }
+
+  @command('module1', 'createAccount')
+  createAccount3(message) {
+    console.log('AccountCommandHandler2 createAccount3 ok');
   }
 }
 ```

@@ -31,6 +31,7 @@ export function getDispatcher(type) {
     if (!(dispatcher instanceof Dispatcher)) {
       throw new Error(err.configFailed, type + i18n.t('消息分发器未正确配置，可以在config/bus.js中指定'));
     }
+    dispatcher.createAndRegisterAlias();
     fxData.container[type + 'Dispatcher'] = dispatcher;
   }
 
