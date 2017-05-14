@@ -9,7 +9,7 @@ export default class DirectBus extends Bus {
 
 
   async commit() {
-    log(i18n.t('总线提交'));
+    log(i18n.t('总线提交')+this.type);
     const dispatcher = getDispatcher(this.type);
     this._backupMessageArray = [...this.messageQueue];
     this.messageQueue.forEach(async(msg) => {
@@ -24,6 +24,6 @@ export default class DirectBus extends Bus {
       this.messageQueue = [...this._backupMessageArray];
     }
     this._committed = false;
-    log(i18n.t('总线回滚'));
+    log(i18n.t('总线回滚')+this.type);
   }
 }

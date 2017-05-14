@@ -158,6 +158,15 @@ export default class MessageDispatcher extends Dispatcher {
       this._dispatchFailedListeners.push(dispatchFailedListener);
     }
 
+  removeListener(dispatchingListener, dispatchedListener, dispatchFailedListener) {
+    if (isFunction(dispatchingListener))
+      this._dispatchingListeners.splice(this._dispatchingListeners.indexOf(dispatchingListener), 1);
+    if (isFunction(dispatchedListener)) 
+      this._dispatchedListeners.splice(this._dispatchedListeners.indexOf(dispatchedListener), 1);
+    if (isFunction(dispatchFailedListener))
+      this._dispatchFailedListeners.splice(this._dispatchFailedListeners.indexOf(dispatchFailedListener), 1);
+    }
+
   _onDispatching(event) {
     this._dispatchingListeners.forEach(listener => {
       try {

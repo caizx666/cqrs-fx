@@ -24,6 +24,7 @@ describe('Bus', function() {
 
     fxData.alias = {};
     fxData.alias['module1/command/AccountCommandHandler'] = path.normalize(__dirname + '/../../demo/module1/command/AccountCommandHandler.js');
+    fxData.alias['module1/event/AccountEventHandler'] = path.normalize(__dirname + '/../../demo/module1/event/AccountEventHandler.js');
     fxData.alias['module1/domain/AdminAccount'] = path.normalize(__dirname + '/../../demo/module1/domain/AdminAccount.js');
     fxData.alias['module1/domain/UserAccount'] = path.normalize(__dirname + '/../../demo/module1/domain/UserAccount.js');
 
@@ -45,12 +46,13 @@ describe('Bus', function() {
       }
     });
 
-    console.log(bus.getCommandDispatcher()._handlers)
+    //console.log(bus.getCommandDispatcher()._handlers)
 
     bus.publishCommand({
       name: 'module1/createAccount',
       data: {
-
+        userName: 'aaa',
+        password: '11144'
       }
     });
   });
