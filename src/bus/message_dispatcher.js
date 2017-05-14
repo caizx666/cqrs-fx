@@ -115,6 +115,7 @@ export default class MessageDispatcher extends Dispatcher {
     if (!handlers || handlers.length <= 0) {
       log(i18n.t('无消息处理器'));
     }
+    log(i18n.t('执行') + this.type);
     for (const {CLS, method}
     of handlers) {
       var handler = new CLS();
@@ -161,7 +162,7 @@ export default class MessageDispatcher extends Dispatcher {
   removeListener(dispatchingListener, dispatchedListener, dispatchFailedListener) {
     if (isFunction(dispatchingListener))
       this._dispatchingListeners.splice(this._dispatchingListeners.indexOf(dispatchingListener), 1);
-    if (isFunction(dispatchedListener)) 
+    if (isFunction(dispatchedListener))
       this._dispatchedListeners.splice(this._dispatchedListeners.indexOf(dispatchedListener), 1);
     if (isFunction(dispatchFailedListener))
       this._dispatchFailedListeners.splice(this._dispatchFailedListeners.indexOf(dispatchFailedListener), 1);
