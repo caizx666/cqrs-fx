@@ -40,11 +40,116 @@ cqrs.publishCommand('createAccount',
 
 ** App不要创建多个实例，整个系统都是单例的 **
 
+## 配置性 && 扩展性：
+
+可以通过构造App实例时配置系统
+
+```js
+new App({
+  appPath: path.join(__dirname, 'demo'),
+  bus: {
+    dispatcher : 'message_dipatcher',
+    commandBus : 'direct',
+    eventBus : 'mq',
+    eventMQ : {
+      name: 'eventqueue',
+      port: 6379,
+      host: '127.0.0.1'
+    }
+  },
+  event: {
+    storage: 'mongo_domain_event'
+    collection: 'events',
+    mongo:{
+      ...
+    },
+    mysql:{
+      ...
+    },
+    redis:{
+      ...
+    }
+  },
+  repository: {
+    type: 'event_sourced'
+  },
+  snapshot: {
+    provider: 'event_number',
+    storage: 'mongo',  // redis mysql mongo ...
+    collection: 'snapshots',
+    // immediate: Indicates that immediate snapshot create/update should be performed.
+    // postpone: Indicates that the creating/updating of the snapshots  would be postponed to a later scenario.
+    option: 'immediate',
+    // 快照的保存周期，默认每100个事件保存一次快照
+    numberOfEvents: 100,
+    mongo:{
+      ...
+    },
+    mysql:{
+      ...
+    },
+    redis:{
+      ...
+    }
+  },
+  mongo:{
+    url: 'mongodb://localhost:27017/cqrs'
+  },
+  mysql: {
+    host: 'localhost',
+    user: 'root',
+    password: '123456',
+    database: 'cqrsdb'
+  },
+  redis:{
+    host: "127.0.0.1",
+    port: 6379,
+    password: "",
+    timeout: 0
+  }
+});
+```
+
+可以配置为一个对象或加载函数
+
+```js
+new App({
+  bus: {
+    commandBus: MyCommandBus,
+    eventBus: ()=> new MyEventBus({...})
+  },
+  event: {
+    storage: eventBus: ()=> new MyEventStorage({...})
+  },
+  repository: {
+    type: eventBus: ()=> new MyRepository({...})
+  },
+  snapshot: {
+    provider: eventBus: ()=> new MySnapshotProvider({...})
+  }
+});
+```
+
 ## 开发：
 
-模块采用面向对象的开发
+模块采用面向对象的开发，可以执行较复杂的项目，所以划分了模块，每个模块建议是一个完整的业务领域  
+
++ module1
+  + command
+    + AccountCommandHandler.js
+  + domain
+    + Account.js
+    + AdminAccount.js
+    + UserAccount.js
+  + event
+    + AccountEventHandler.js
++ module2
+...
+
 
 ### 领域对象
+
+放在每个模块的domain文件夹里
 
 ```js
 import {Aggregate} from 'cqrs-fx';
@@ -136,6 +241,8 @@ export default class UserAccount extends Account {
 
 ### 命令执行Handler
 
+放在command文件夹里
+
 ```js
 import {CommandHandler} from 'cqrs-fx';
 
@@ -160,6 +267,8 @@ export default class AccountCommandHandler extends CommandHandler {
 ```
 
 ### 业务事件的Handler
+
+放在event文件夹里
 
 ```js
 import {EventHandler} from 'cqrs-fx';
@@ -195,95 +304,7 @@ export default class AccountCommandHandler2 extends CommandHandler {
 }
 ```
 
-## 配置性 && 扩展性：
 
-可以通过构造App实例时配置系统
-
-```js
-new App({
-  appPath: path.join(__dirname, 'demo'),
-  bus: {
-    dispatcher : 'message_dipatcher',
-    commandBus : 'direct',
-    eventBus : 'mq',
-    eventMQ : {
-      name: 'eventqueue',
-      port: 6379,
-      host: '127.0.0.1'
-    }
-  },
-  event: {
-    storage: 'mongo_domain_event'
-    collection: 'events',
-    mongo:{
-      ...
-    },
-    mysql:{
-      ...
-    },
-    redis:{
-      ...
-    }
-  },
-  repository: {
-    type: 'event_sourced'
-  },
-  snapshot: {
-    provider: 'event_number',
-    storage: 'mongo',  // redis mysql mongo ...
-    collection: 'snapshots',
-    // immediate: Indicates that immediate snapshot create/update should be performed.
-    // postpone: Indicates that the creating/updating of the snapshots  would be postponed to a later scenario.
-    option: 'immediate',
-    // 快照的保存周期，默认每100个事件保存一次快照
-    numberOfEvents: 100,
-    mongo:{
-      ...
-    },
-    mysql:{
-      ...
-    },
-    redis:{
-      ...
-    }
-  },
-  mongo:{
-    url: 'mongodb://localhost:27017/cqrs'
-  },
-  mysql: {
-    host: 'localhost',
-    user: 'root',
-    password: '123456',
-    database: 'cqrsdb'
-  },
-  redis:{
-    host: "127.0.0.1",
-    port: 6379,
-    password: "",
-    timeout: 0
-  }
-});
-```
-
-可以配置为一个对象或加载函数
-
-```js
-new App({
-  bus: {
-    commandBus: MyCommandBus,
-    eventBus: ()=> new MyEventBus({...})
-  },
-  event: {
-    storage: eventBus: ()=> new MyEventStorage({...})
-  },
-  repository: {
-    type: eventBus: ()=> new MyRepository({...})
-  },
-  snapshot: {
-    provider: eventBus: ()=> new MySnapshotProvider({...})
-  }
-});
-```
 
 ## 快照
 
