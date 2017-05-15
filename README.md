@@ -38,7 +38,7 @@ cqrs.publishCommand('createAccount',
   });
 ```
 
-** App不要创建多个实例，整个系统都是单例的 **
+**App不要创建多个实例，整个系统都是单例的**
 
 ## 配置性 && 扩展性：
 
@@ -345,3 +345,5 @@ command执行不管成功或失败都不会返回任何结果，我们通常挂�
 ## 查询
 
 查询结果需要在EventHandler中保存到数据库中，查询直接查找即可
+
+**如果你需要一个完整可以运行的系统，可以看看<https://github.com/saas-plat/saas-plat-server>项目**
