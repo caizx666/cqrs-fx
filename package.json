@@ -21,7 +21,7 @@
     "url": "https://github.com/saas-plat/cqrs.git"
   },
   "author": "saas-plat.com",
-  "license": "Apache License",
+  "license": "MIT",
   "dependencies": {
     "assert": "^1.4.1",
     "bull": "^2.2.6",
