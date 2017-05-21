@@ -28,8 +28,12 @@ export default class MessageDispatcher extends Dispatcher {
   }
 
   registerHandler(handlerType) {
+    assert(handlerType);
     let ctoken = getDecoratorToken(handlerType);
     if (!ctoken.name && !ctoken.module) {
+      if (!handlerType.prototype) {
+        log(i18n.t('不支持的handler类型'));
+      }
       ctoken = {
         module: handlerType.prototype.__module,
         name: handlerType.name
@@ -116,10 +120,13 @@ export default class MessageDispatcher extends Dispatcher {
     }
     log(i18n.t('开始执行') + this.type + ':' + `${module}/${name} (${id})`);
     this._onDispatching(message);
+    let curHandler;
     try {
       for (const {CLS, method}
       of handlers) {
+        curHandler = null;
         var handler = new CLS();
+        curHandler = handler;
         if (!isFunction(handler[method])) {
           log(i18n.t('处理器无法执行命令'));
           continue;
@@ -130,8 +137,9 @@ export default class MessageDispatcher extends Dispatcher {
       log(i18n.t('完成执行') + this.type + ':' + `${module}/${name}`);
       return true;
     } catch (err) {
-      log(i18n.t('失败执行') + this.type + ':' + `${module}/${name}` + ',' + err);
-      this._onDispatchFaild(message, 'error', err);
+      log(i18n.t('失败执行') + this.type + ':' + `${module}/${name}`);
+      console.warn(err, err.stack);
+      this._onDispatchFaild(message, 'error', err, curHandler);
     }
   }
 
@@ -159,30 +167,30 @@ export default class MessageDispatcher extends Dispatcher {
       this._dispatchFailedListeners.splice(this._dispatchFailedListeners.indexOf(dispatchFailedListener), 1);
     }
 
-  _onDispatching(event) {
+  _onDispatching(message) {
     this._dispatchingListeners.forEach(listener => {
       try {
-        listener(event);
+        listener(message);
       } catch (e) {
         log(e);
       }
     });
   }
 
-  _onDispatchFaild(event) {
+  _onDispatchFaild(message, code, error) {
     this._dispatchFailedListeners.forEach(listener => {
       try {
-        listener(event);
+        listener(message, code, error);
       } catch (e) {
         log(e);
       }
     });
   }
 
-  _onDispatched(event) {
+  _onDispatched(message) {
     this._dispatchedListeners.forEach(listener => {
       try {
-        listener(event);
+        listener(message);
       } catch (e) {
         log(e);
       }

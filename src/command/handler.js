@@ -12,9 +12,7 @@ export default class CommandHandler {
   }
 
   getAggregate(name, module) {
-    if (!module)
-      module = this.module; 
-    return Aggregate.get(name, module);
+    return Aggregate.get(name, module || this.module);
   }
 
 }

@@ -9,16 +9,13 @@ export default class DirectBus extends Bus {
   _backupMessageArray;
 
   async commit() {
-    log(i18n.t('总线提交') + this.type);
+    log(i18n.t('总线提交') + ' ' + this.messageQueue.length + ' ' + this.type);
     const dispatcher = getDispatcher(this.type);
     this._backupMessageArray = [...this.messageQueue];
     this.messageQueue.length = 0;
-    this.messageQueue.forEach(async(msg) => {
+    this._backupMessageArray.forEach(async(msg) => {
       if (await dispatcher.dispatch(msg)) {
         this._backupMessageArray.splice(this._backupMessageArray.indexOf(msg), 1);
-        getRepository().commit();
-      // }else{
-      //   getRepository().rollback();
       }
     });
     this._committed = true;

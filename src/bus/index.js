@@ -87,13 +87,13 @@ export async function publish(type, ...messages) {
 
   let msgs = [];
   if (messages.length == 3 && typeof messages[0] === 'string') {
-    msgs.push({module: messages[0], name: message[1], data: message[2]});
+    msgs.push({module: messages[0], name: messages[1], data: messages[2]});
   } else if (messages.length == 2 && typeof messages[0] === 'string') {
     const mn = messages[0].split('/');
     if (mn.length != 2) {
       throw new Error(i18n.t('消息name需要包含module/name信息'));
     }
-    msgs.push({module: mn[0], name: mn[1], data: message[1]});
+    msgs.push({module: mn[0], name: mn[1], data: messages[1]});
   } else {
     msgs = messages;
   }
