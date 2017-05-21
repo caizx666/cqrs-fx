@@ -26,26 +26,26 @@ describe('MessageDispatcher', function() {
         storage: 'memory'
       }
     });
-
     const dispatcher = new MessageDispatcher('command');
     dispatcher.createAndRegisterAlias();
-
     assert.equal(dispatcher.getHandlers('module1/createAccount').length, 3);
     assert.equal(dispatcher.getHandlers('createBook', 'module2').length, 1);
     assert.equal(dispatcher.getHandlers('module2/createBook2').length, 0);
 
-    const listener = ({module, name, type, handler}) => {
+    const listener = ({module, name, type, id}) => {
 
       assert(module);
       assert(name);
       assert(type);
-      assert(handler);
+      assert(id);
 
     }
     dispatcher.addListener(listener, listener, listener);
 
     await dispatcher.dispatch({
-      name: 'module1/createAccount',
+      name: 'createAccount',
+      module: 'module1',
+      id: '123456',
       type: 'command',
       data: {
         userName: 'aaa',
@@ -53,15 +53,7 @@ describe('MessageDispatcher', function() {
       }
     });
 
-    await dispatcher.dispatch({
-      name: 'createAccount',
-      module: 'module1',
-      type: 'command',
-      data: {
-        userName: 'aa22a',
-        password: 'bsssbb'
-      }
-    });
+
 
   });
 });

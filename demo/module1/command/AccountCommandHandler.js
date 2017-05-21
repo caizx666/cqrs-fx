@@ -5,7 +5,7 @@ export default class AccountCommandHandler extends CommandHandler {
     await this.repository.use(async() => {
       const userAccount = this.getAggregate('UserAccount').create(message);
       await this.repository.save(userAccount);
-      await this.repository.commit();
+      //await this.repository.commit();
     });
   }
 

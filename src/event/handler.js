@@ -1,10 +1,4 @@
 
-export default class  {
-  constructor(){
+export default class EventHandler {
 
-  }
-
-  run(message){
-    return true;
-  }
 }

@@ -38,6 +38,7 @@ export default class MySqlEventStorage extends EventStorage {
     const db = await this.connect();
     return await db.collection(this.collection).count(spec);
   }
+ 
 
   async select({
     id,

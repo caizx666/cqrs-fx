@@ -10,6 +10,8 @@ export default class MemoryEventStorage extends EventStorage {
     return this.list.filter(item => this.filter(item, spec)).length;
   }
 
+ 
+
   select(spec) {
     if (!spec) {
       return [...this.list];

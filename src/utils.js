@@ -9,11 +9,14 @@ export const isFile = file => {
 export const isDir = file => {
   return fs.statSync(file).isDirectory();
 };
-export const log = msg => {
+export const log = (...msgs) => {
   if (config.get('log').enable) {
-    console.log(msg);
-  }
-};
+    if (typeof msgs[0] == 'object' && msgs[0].message)
+      console.log(msgs[0].message);
+    else
+      console.log.apply(console.log, msgs);
+    }
+  };
 export const sep = path.sep;
 export const normalize = path.normalize;
 export const join = () => {

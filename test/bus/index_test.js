@@ -20,7 +20,7 @@ describe('Bus', function() {
     });
   });
 
-  it('发送命令触发事件', function() {
+  it('发送命令触发事件', async function() {
 
     fxData.alias = {};
     fxData.alias['module1/command/AccountCommandHandler'] = path.normalize(__dirname + '/../../demo/module1/command/AccountCommandHandler.js');
@@ -28,7 +28,7 @@ describe('Bus', function() {
     fxData.alias['module1/domain/AdminAccount'] = path.normalize(__dirname + '/../../demo/module1/domain/AdminAccount.js');
     fxData.alias['module1/domain/UserAccount'] = path.normalize(__dirname + '/../../demo/module1/domain/UserAccount.js');
 
-    fxData.container={};
+    fxData.container = {};
 
     config.init({
       bus: {
@@ -41,14 +41,14 @@ describe('Bus', function() {
       snapshot: {
         storage: 'memory'
       },
-      log:{
+      log: {
         enable: true
       }
     });
 
     //console.log(bus.getCommandDispatcher()._handlers)
 
-    bus.publishCommand({
+    await bus.publishCommand({
       name: 'module1/createAccount',
       data: {
         userName: 'aaa',

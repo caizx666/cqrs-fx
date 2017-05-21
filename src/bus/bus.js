@@ -1,4 +1,4 @@
-import {isString, log} from '../utils';
+import {isString, log, uuid} from '../utils';
 import i18n from '../i18n';
 
 export default class Bus {
@@ -27,6 +27,14 @@ export default class Bus {
       if (!msg) {
         log(i18n.t('无效消息跳过'))
         continue;
+      }
+      if (!isString (msg.id)){
+        msg.id = uuid.v1();
+      }
+      if (!isString(msg.module)){
+        const mn = msg.name.split('/');
+        msg.module = mn[0];
+        msg.name = mn[1];
       }
       this.messageQueue.push(msg);
       this._committed = false;

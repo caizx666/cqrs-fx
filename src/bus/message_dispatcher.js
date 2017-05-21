@@ -81,66 +81,57 @@ export default class MessageDispatcher extends Dispatcher {
 
   // message = {name,module,type,data}
   async dispatch(message) {
-    if (!message.name || !isString(message.name)) {
+    if (!isString(message.id)) {
+      this._onDispatchFaild(message, 'nomessage');
+      log(i18n.t('消息id无效'));
+      return;
+    }
+    if (!isString(message.name)) {
+      this._onDispatchFaild(message, 'nomessage');
       log(i18n.t('消息name无效'));
       return;
     }
     if (message.type !== 'event' && message.type !== 'command') {
+      this._onDispatchFaild(message, 'nomessage');
       log(i18n.t('消息type无效'));
       return;
     }
     if (message.type !== this.type) {
-      console.log(this.type)
+      this._onDispatchFaild(message, 'notsupport');
       log(message.type + i18n.t('消息无法分发'));
       return;
     }
-
-    let module;
-    let name;
-    if (!message.module) {
-      const mn = message.name.split('/');
-      if (mn.length == 2) {
-        module = mn[0];
-        name = mn[1];
-      }
-    } else {
-      module = message.module;
-      name = message.name;
-    }
+    const id = message.id;
+    const module = message.module;
+    const name = message.name;
     if (!module) {
+      this._onDispatchFaild(message, 'nomodule');
       log(i18n.t('消息module无效'));
       return;
     }
     const handlers = this.getHandlers(name, module);
     if (!handlers || handlers.length <= 0) {
+      this._onDispatchFaild(message, 'nohandler');
       log(i18n.t('无消息处理器'));
     }
-    log(i18n.t('执行') + this.type);
-    for (const {CLS, method}
-    of handlers) {
-      var handler = new CLS();
-      if (!isFunction(handler[method])) {
-        log(i18n.t('处理器无法执行命令'));
-        continue;
-      }
-      const evt = {
-        type: message.type,
-        data: message.data,
-        module,
-        name,
-        handler
-      };
-      log(i18n.t('开始执行') + this.type + ':' + `${module}/${name}`);
-      this._onDispatching(evt);
-      try {
+    log(i18n.t('开始执行') + this.type + ':' + `${module}/${name} (${id})`);
+    this._onDispatching(message);
+    try {
+      for (const {CLS, method}
+      of handlers) {
+        var handler = new CLS();
+        if (!isFunction(handler[method])) {
+          log(i18n.t('处理器无法执行命令'));
+          continue;
+        }
         await handler[method].bind(handler)(message.data || {});
-        this._onDispatched(evt);
-        log(i18n.t('完成执行') + this.type + ':' + `${module}/${name}`);
-      } catch (err) {
-        evt.error = err;
-        log(i18n.t('失败执行') + this.type + ':' + `${module}/${name}` + ',' + err);
-        this._onDispatchFaild(evt);
       }
+      this._onDispatched(message);
+      log(i18n.t('完成执行') + this.type + ':' + `${module}/${name}`);
+      return true;
+    } catch (err) {
+      log(i18n.t('失败执行') + this.type + ':' + `${module}/${name}` + ',' + err);
+      this._onDispatchFaild(message, 'error', err);
     }
   }
 
