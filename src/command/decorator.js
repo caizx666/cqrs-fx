@@ -2,7 +2,7 @@ import {log, isFunction} from '../utils'
 import i18n from '../i18n';
 
 export function getDecoratorToken(fn) {
-  if (!isFunction) {
+  if (!isFunction(fn)) {
     log(i18n.t('不是有效的command'))
     return;
   }
@@ -17,7 +17,7 @@ export function module(module) {
     }
     if (module) {
       if (fn.__commandModule) {
-        log(i18n.t('command属性冲突'));
+        log(i18n.t('commandModule属性冲突'));
       }
       fn.__commandModule = module;
     }
@@ -50,13 +50,13 @@ export function command(...moduleOrNames) {
     }
     if (module) {
       if (fn.value.__commandModule) {
-        log(i18n.t('command属性冲突'));
+        log(i18n.t('commandModule属性冲突'));
       }
       fn.value.__commandModule = module;
     }
     if (name) {
-      if (fn.value.__commandModule) {
-        log(i18n.t('command属性冲突'));
+      if (fn.value.__commandName) {
+        log(i18n.t('commandName属性冲突'));
       }
       fn.value.__commandName = name;
     }

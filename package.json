@@ -6,9 +6,10 @@
   "scripts": {
     "compile": "babel src --out-dir lib",
     "prepublish": "npm run compile",
-    "watch": "babel  src --watch --out-dir lib  --source-maps",
+    "watch": "babel  src --watch --out-dir ../saas-plat-server/node_modules/cqrs-fx/lib  --source-maps",
     "test": "node node_modules/mocha/bin/mocha --compilers js:babel-core/register ",
     "test-all": "node node_modules/mocha/bin/mocha --compilers js:babel-core/register test/**/*_test.js",
+    "publish": "npm publish --registry http://registry.npmjs.org",
     "test-debug": "node-debug   --web-port=9900  node_modules/mocha/bin/_mocha   --compilers js:babel-core/register "
   },
   "keywords": [

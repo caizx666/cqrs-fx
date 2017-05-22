@@ -1,8 +1,20 @@
-import {log, isFunction, isString} from '../utils';
-import {fxData, _require} from '../core';
+import {
+  log,
+  isFunction,
+  isString
+} from '../utils';
+import {
+  fxData,
+  _require
+} from '../core';
 import i18n from '../i18n';
 import Dispatcher from './dispatcher';
-import {getDecoratorToken} from '../command/decorator';
+import {
+  getDecoratorToken as getCommandToken
+} from '../command/decorator';
+import {
+  getDecoratorToken as getEventToken
+} from '../event/decorator';
 import assert from 'assert';
 
 export default class MessageDispatcher extends Dispatcher {
@@ -29,7 +41,7 @@ export default class MessageDispatcher extends Dispatcher {
 
   registerHandler(handlerType) {
     assert(handlerType);
-    let ctoken = getDecoratorToken(handlerType);
+    let ctoken = this.type === 'event'? getEventToken(handlerType) : getCommandToken(handlerType);
     if (!ctoken.name && !ctoken.module) {
       if (!handlerType.prototype) {
         log(i18n.t('不支持的handler类型'));
@@ -46,29 +58,35 @@ export default class MessageDispatcher extends Dispatcher {
       if (!isFunction(handlerType.prototype[p])) {
         continue;
       }
-      const {
+      let {
         module = ctoken.module,
         name = p
-      } = getDecoratorToken(handlerType.prototype[p]);
+      } = this.type === 'event'? getEventToken(handlerType.prototype[p]) : getCommandToken(handlerType.prototype[p]);
+
       if (module && name) {
         let items = this._handlers[`${module}/${name}`];
         if (!items) {
           this._handlers[`${module}/${name}`] = items = [];
         }
         if (!items.find(item => item.CLS.name == handlerType.name && item.method == p)) {
-          items.push({CLS: handlerType, method: p});
+          items.push({
+            CLS: handlerType,
+            method: p
+          });
         }
+      } else {
+        log(i18n.t('注册失败'), handlerType.name + '.' + p)
       }
     }
   }
 
   unregisterHandler(handler) {
-    const ctoken = getDecoratorToken(handlerType);
+    const ctoken = this.type === 'event'? getEventToken(handlerType) : getCommandToken(handlerType);
     for (const p in handlerType.prototype) {
       const {
         module = ctoken.module,
-        name
-      } = getDecoratorToken(handlerType.prototype[p]);
+          name
+      } = this.type === 'event'? getEventToken(handlerType.prototype[p]) : getCommandToken(handlerType.prototype[p]);
       if (module && name) {
         let items = this._handlers[`${module}/${name}`];
         if (!items) {
@@ -122,8 +140,10 @@ export default class MessageDispatcher extends Dispatcher {
     this._onDispatching(message);
     let curHandler;
     try {
-      for (const {CLS, method}
-      of handlers) {
+      for (const {
+          CLS,
+          method
+        } of handlers) {
         curHandler = null;
         var handler = new CLS();
         curHandler = handler;
@@ -156,7 +176,7 @@ export default class MessageDispatcher extends Dispatcher {
       this._dispatchedListeners.push(dispatchedListener);
     if (isFunction(dispatchFailedListener))
       this._dispatchFailedListeners.push(dispatchFailedListener);
-    }
+  }
 
   removeListener(dispatchingListener, dispatchedListener, dispatchFailedListener) {
     if (isFunction(dispatchingListener))
@@ -165,7 +185,7 @@ export default class MessageDispatcher extends Dispatcher {
       this._dispatchedListeners.splice(this._dispatchedListeners.indexOf(dispatchedListener), 1);
     if (isFunction(dispatchFailedListener))
       this._dispatchFailedListeners.splice(this._dispatchFailedListeners.indexOf(dispatchFailedListener), 1);
-    }
+  }
 
   _onDispatching(message) {
     this._dispatchingListeners.forEach(listener => {
