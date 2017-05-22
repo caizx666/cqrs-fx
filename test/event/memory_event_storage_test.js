@@ -104,5 +104,7 @@ describe('MemoryEventStorage', function() {
       assert.equal(item.id, 10000+c);
       c++;
     });
+
+    assert.equal(c, 1000);
   });
 });
