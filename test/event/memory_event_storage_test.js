@@ -26,10 +26,10 @@ describe('MemoryEventStorage', function() {
 
     store.commit();
 
-    c =  store.count()
+    c = store.count()
     assert.equal(1, c);
 
-    let item =  store.select({id: 1});
+    let item = store.select({id: 1});
     assert.equal(item.length, 1);
 
     item = item[0];
@@ -50,16 +50,14 @@ describe('MemoryEventStorage', function() {
 
   });
 
-  it('支持visit访问', async function () {
-
+  it('支持visit访问', async function() {
 
     const store = new MemoryEventStorage();
-
 
     for (let i = 0; i < 1000; i++) {
       const t = new Date();
       store.insert({
-        id: 10000+i,
+        id: 10000 + i,
         name: 'xxxx',
         module: 'mm',
         source_type: 'aaa/bbb/ccc',
@@ -79,7 +77,7 @@ describe('MemoryEventStorage', function() {
     for (let i = 0; i < 1000; i++) {
       const t = new Date();
       store.insert({
-        id: 10000+i,
+        id: 10000 + i,
         name: 'xxxx',
         module: 'mm2',
         source_type: 'aaa/bbb/ccc',
@@ -93,7 +91,7 @@ describe('MemoryEventStorage', function() {
         }
       });
     }
-  store.commit();
+    store.commit();
 
     assert.equal(store.count(), 2000);
 
@@ -101,10 +99,72 @@ describe('MemoryEventStorage', function() {
     await store.visit({
       module: 'mm'
     }, (item) => {
-      assert.equal(item.id, 10000+c);
+      assert.equal(item.id, 10000 + c);
       c++;
     });
 
     assert.equal(c, 1000);
+  });
+
+  it('支持类似mongodb的表达式', async function() {
+    const store = new MemoryEventStorage();
+    assert(store.filter({
+      key: 100
+    }, {
+      key: {
+        $gt: 99
+      }
+    }) === true);  
+    assert(store.filter({
+      key: 100
+    }, {
+      key: {
+        $gt: 100
+      }
+    }) === false);
+    assert(store.filter({
+      key: 100
+    }, {
+      key: {
+        $gt: 111
+      }
+    }) === false);
+
+    assert(store.filter({
+      key: 66
+    }, {
+      key: {
+        $lt: 77
+      }
+    }) === true);
+    assert(store.filter({
+      key: 66
+    }, {
+      key: {
+        $lt: 66
+      }
+    }) === false);
+    assert(store.filter({
+      key: 66
+    }, {
+      key: {
+        $lt: 55
+      }
+    }) === false);
+
+    assert(store.filter({
+      key: 'aa'
+    }, {
+      key: {
+        $in: ['a', 'b']
+      }
+    }) === false);
+    assert(store.filter({
+      key: 'aa'
+    }, {
+      key: {
+        $in: ['a', 'aa']
+      }
+    }) === true);
   });
 });

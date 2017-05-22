@@ -1,8 +1,6 @@
 import EventStorage from './event_storage';
 import assert from 'assert';
-import {
-  isFunction
-} from '../utils'
+import {isFunction} from '../utils'
 
 export default class MemoryEventStorage extends EventStorage {
   list = [];
@@ -28,23 +26,43 @@ export default class MemoryEventStorage extends EventStorage {
 
   filter(item, spec) {
     for (const p in spec) {
-      if (spec[p].length && spec[p].length > 1) {
-        if (spec[p][0] == '>') {
-          if (item[p] <= spec[p][1]) {
+      if (typeof spec[p] === 'object') {
+        if ('$gt' in spec[p]) {
+          if (item[p] <= spec[p]['$gt']) {
             return false;
           } else {
             continue;
           }
         }
-        if (spec[p][0] == '<') {
-          if (item[p] >= spec[p][1]) {
+        if ('$lt' in spec[p]) {
+          if (item[p] >= spec[p]['$lt']) {
             return false;
           } else {
             continue;
           }
         }
-      }
-      if (item[p] != spec[p]) {
+        if ('$gte' in spec[p]) {
+          if (item[p] < spec[p]['$gte']) {
+            return false;
+          } else {
+            continue;
+          }
+        }
+        if ('$lte' in spec[p]) {
+          if (item[p] > spec[p]['$lte']) {
+            return false;
+          } else {
+            continue;
+          }
+        }
+        if ('$in' in spec[p]) {
+          if (spec[p]['$in'].indexOf(item[p]) == -1) {
+            return false;
+          } else {
+            continue;
+          }
+        }
+      } else if (item[p] != spec[p]) {
         return false;
       }
     }

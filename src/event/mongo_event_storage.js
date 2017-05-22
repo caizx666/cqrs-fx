@@ -73,7 +73,7 @@ export default class MySqlEventStorage extends EventStorage {
           _id,
           ...other
         } = item;
-        visitor({
+        await visitor({
           id: _id,
           ...other
         });
