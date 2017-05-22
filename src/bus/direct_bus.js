@@ -13,11 +13,11 @@ export default class DirectBus extends Bus {
     const dispatcher = getDispatcher(this.type);
     this._backupMessageArray = [...this.messageQueue];
     this.messageQueue.length = 0;
-    this._backupMessageArray.forEach(async(msg) => {
+    for(let msg of this._backupMessageArray){
       if (await dispatcher.dispatch(msg)) {
         this._backupMessageArray.splice(this._backupMessageArray.indexOf(msg), 1);
       }
-    });
+    }
     this._committed = true;
   }
 

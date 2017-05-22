@@ -107,7 +107,7 @@ export default class MessageDispatcher extends Dispatcher {
       this._onDispatchFaild(message, 'nomessage');
       log(i18n.t('消息id无效'));
       return;
-    }
+    }    
     if (!isString(message.name)) {
       this._onDispatchFaild(message, 'nomessage');
       log(i18n.t('消息name无效'));
@@ -136,7 +136,7 @@ export default class MessageDispatcher extends Dispatcher {
       this._onDispatchFaild(message, 'nohandler');
       log(i18n.t('无消息处理器'));
     }
-    log(i18n.t('开始执行') + this.type + ':' + `${module}/${name} (${id})`);
+    log(i18n.t('开始执行') + this.type + ' ' + `${module}/${name} (${id})`);
     this._onDispatching(message);
     let curHandler;
     try {
@@ -154,10 +154,10 @@ export default class MessageDispatcher extends Dispatcher {
         await handler[method].bind(handler)(message.data || {});
       }
       this._onDispatched(message);
-      log(i18n.t('完成执行') + this.type + ':' + `${module}/${name}`);
+      log(i18n.t('完成执行') + this.type + ' ' + `${module}/${name} (${id})`);
       return true;
     } catch (err) {
-      log(i18n.t('失败执行') + this.type + ':' + `${module}/${name}`);
+      log(i18n.t('失败执行') + this.type + ' ' + `${module}/${name} (${id})`);
       console.warn(err, err.stack);
       this._onDispatchFaild(message, 'error', err, curHandler);
     }

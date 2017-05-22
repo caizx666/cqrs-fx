@@ -21,7 +21,7 @@ export default class Bus {
       }
       if (!isString(msg.name)) {
         throw new Error(i18n.t('消息名称无效，无法发布'));
-      }
+      } 
       if (!isString(msg.module) && msg.name.indexOf('/') <= 0) {
         throw new Error(i18n.t('消息module名称无效，无法发布'));
       }

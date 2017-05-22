@@ -99,7 +99,7 @@ export async function publish(type, ...messages) {
   }
 
   const bus = getBus(type);
-  bus.publish(...msgs);
+  await bus.publish(...msgs);
   await bus.commit();
 }
 
