@@ -1,7 +1,8 @@
 import config from '../config';
-import {expr} from '../utils';
+import {expr,isFunction} from '../utils';
 import mysql from 'mysql';
 import EventStorage from './event_storage';
+import assert from 'assert';
 
 export default class MySqlEventStorage extends EventStorage {
   constructor() {
@@ -25,7 +26,12 @@ export default class MySqlEventStorage extends EventStorage {
     });
   }
 
- 
+  async visit(spec, visitor) {
+    assert(isFunction(visitor));
+    return new Promise(function(resolve, reject) {
+      // todo
+    });
+  }
 
   select(spec) {
     return new Promise(function(resolve, reject) {

@@ -1,6 +1,11 @@
-import {MongoClient} from 'mongodb';
+import {
+  MongoClient
+} from 'mongodb';
 import config from '../config';
-import {expr} from '../utils';
+import {
+  expr,
+  isFunction
+} from '../utils';
 import EventStorage from './event_storage';
 import assert from 'assert';
 
@@ -27,30 +32,64 @@ export default class MySqlEventStorage extends EventStorage {
       const collections = await db.collections();
       if (collections.indexOf(this.collection) == -1) {
         const collection = await db.createCollection(this.collection);
-        collection.createIndex({version: 1});
+        collection.createIndex({
+          version: 1
+        });
       }
       this.exists = true;
     }
     return db;
   }
 
+  _getQuery({
+    id,
+    ...other
+  }) {
+    if (id !== undefined) {
+      return {
+        _id: id,
+        ...other
+      };
+    } else {
+      return other;
+    }
+  }
+
   async count(spec) {
     const db = await this.connect();
     return await db.collection(this.collection).count(spec);
   }
- 
 
-  async select({
-    id,
-    ...other
-  }) {
+  async visit(spec, visitor) {
+    assert(isFunction(visitor));
+    const db = await this.connect();
+    try {
+      const cursor = await db.collection(this.collection).find(this._getQuery(spec)).sort({
+        timestamp: 1
+      });
+      while (await cursor.hasNext()) {
+        const item = await cursor.next();
+        const {
+          _id,
+          ...other
+        } = item;
+        visitor({
+          id: _id,
+          ...other
+        });
+      }
+    } finally {
+      db.close();
+    }
+  }
+
+  async select(spec) {
     const db = await this.connect();
     try {
       // 由小到大排序
-      return (await db.collection(this.collection).find({
-        _id: id,
-        ...other
-      }).sort({version: 1}).toArray()).map(({
+      return (await db.collection(this.collection).find(this._getQuery(spec)).sort({
+        version: 1
+      }).toArray()).map(({
         _id,
         ...other
       }) => ({

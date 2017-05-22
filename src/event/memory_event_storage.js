@@ -1,4 +1,8 @@
 import EventStorage from './event_storage';
+import assert from 'assert';
+import {
+  isFunction
+} from '../utils'
 
 export default class MemoryEventStorage extends EventStorage {
   list = [];
@@ -10,7 +14,10 @@ export default class MemoryEventStorage extends EventStorage {
     return this.list.filter(item => this.filter(item, spec)).length;
   }
 
- 
+  async visit(spec, visitor) {
+    assert(isFunction(visitor));
+    this.list.filter(item => this.filter(item, spec)).forEach(visitor);
+  }
 
   select(spec) {
     if (!spec) {

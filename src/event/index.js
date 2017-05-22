@@ -8,7 +8,7 @@ import err from '../err';
 import i18n from '../i18n';
 import {fxData} from '../core';
 
-export function getStorage(name) {
+export function getStorage(name = null) {
 
   if (fxData.container.eventStorage) {
     return fxData.container.eventStorage;
@@ -22,23 +22,14 @@ export function getStorage(name) {
   let storage;
   switch (name || evtConfig.storage) {
     case 'mysql_domain_event':
-      storage = new DomainEventStorage(getStorage('mysql'));
+      storage = new DomainEventStorage(new MySqlEventStorage());
       break;
     case 'mongo_domain_event':
-      storage = new DomainEventStorage(getStorage('mongo'));
+      storage = new DomainEventStorage(new MongoEventStorage());
       break;
     case 'memory_domain_event':
-      storage = new DomainEventStorage(getStorage('memory'));
-      break;
-    case 'mysql':
-      storage = new MySqlEventStorage();
-      break;
-    case 'mongo':
-      storage = new MongoEventStorage();
-      break;
-    case 'memory':
-      storage = new MemoryEventStorage();
-      break;
+      storage = new DomainEventStorage(new MemoryEventStorage());
+      break; 
     default:
       storage = storeageLoader
         ? storeageLoader()

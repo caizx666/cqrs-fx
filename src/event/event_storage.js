@@ -15,7 +15,7 @@ export default class EventStorage {
     version,
     ...data
   }) {
-    assert(id);
+    assert(id !== undefined);
     assert(name);
     assert(module);
     assert(source_type);

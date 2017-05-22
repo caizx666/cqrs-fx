@@ -41,7 +41,7 @@ export default class MessageDispatcher extends Dispatcher {
 
   registerHandler(handlerType) {
     assert(handlerType);
-    let ctoken = this.type === 'event'? getEventToken(handlerType) : getCommandToken(handlerType);
+    let ctoken = this.type === 'event' ? getEventToken(handlerType) : getCommandToken(handlerType);
     if (!ctoken.name && !ctoken.module) {
       if (!handlerType.prototype) {
         log(i18n.t('不支持的handler类型'));
@@ -60,8 +60,8 @@ export default class MessageDispatcher extends Dispatcher {
       }
       let {
         module = ctoken.module,
-        name = p
-      } = this.type === 'event'? getEventToken(handlerType.prototype[p]) : getCommandToken(handlerType.prototype[p]);
+          name = p
+      } = this.type === 'event' ? getEventToken(handlerType.prototype[p]) : getCommandToken(handlerType.prototype[p]);
 
       if (module && name) {
         let items = this._handlers[`${module}/${name}`];
@@ -81,12 +81,12 @@ export default class MessageDispatcher extends Dispatcher {
   }
 
   unregisterHandler(handler) {
-    const ctoken = this.type === 'event'? getEventToken(handlerType) : getCommandToken(handlerType);
+    const ctoken = this.type === 'event' ? getEventToken(handlerType) : getCommandToken(handlerType);
     for (const p in handlerType.prototype) {
       const {
         module = ctoken.module,
           name
-      } = this.type === 'event'? getEventToken(handlerType.prototype[p]) : getCommandToken(handlerType.prototype[p]);
+      } = this.type === 'event' ? getEventToken(handlerType.prototype[p]) : getCommandToken(handlerType.prototype[p]);
       if (module && name) {
         let items = this._handlers[`${module}/${name}`];
         if (!items) {
@@ -107,7 +107,7 @@ export default class MessageDispatcher extends Dispatcher {
       this._onDispatchFaild(message, 'nomessage');
       log(i18n.t('消息id无效'));
       return;
-    }    
+    }
     if (!isString(message.name)) {
       this._onDispatchFaild(message, 'nomessage');
       log(i18n.t('消息name无效'));
@@ -210,7 +210,7 @@ export default class MessageDispatcher extends Dispatcher {
   _onDispatched(message) {
     this._dispatchedListeners.forEach(listener => {
       try {
-        listener(message);
+        listener(message, 'ok');
       } catch (e) {
         log(e);
       }

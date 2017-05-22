@@ -49,4 +49,60 @@ describe('MemoryEventStorage', function() {
     assert.equal(item.data.b, 'aaaaaaaaaaaaaaaaaaaaaa');
 
   });
+
+  it('支持visit访问', async function () {
+
+
+    const store = new MemoryEventStorage();
+
+
+    for (let i = 0; i < 1000; i++) {
+      const t = new Date();
+      store.insert({
+        id: 10000+i,
+        name: 'xxxx',
+        module: 'mm',
+        source_type: 'aaa/bbb/ccc',
+        source_id: '1000222-sssssss-eeee-fffffe-333-444',
+        timestamp: t,
+        branch: 0,
+        version: 199,
+        data: {
+          a: 100,
+          b: 'aaaaaaaaaaaaaaaaaaaaaa'
+        }
+      });
+    }
+
+    store.commit();
+
+    for (let i = 0; i < 1000; i++) {
+      const t = new Date();
+      store.insert({
+        id: 10000+i,
+        name: 'xxxx',
+        module: 'mm2',
+        source_type: 'aaa/bbb/ccc',
+        source_id: '1000222-sssssss-eeee-fffffe-333-444',
+        timestamp: t,
+        branch: 0,
+        version: 199,
+        data: {
+          a: 100,
+          b: 'aaaaaaaaaaaaaaaaaaaaaa'
+        }
+      });
+    }
+  store.commit();
+
+    assert.equal(store.count(), 2000);
+
+    let c = 0;
+    await store.visit({
+      module: 'mm'
+    }, (item) => {
+      assert.equal(item.id, 10000+c);
+      c++;
+    });
+  });
 });
