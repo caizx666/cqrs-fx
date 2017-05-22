@@ -12,9 +12,37 @@ export default class MemoryEventStorage extends EventStorage {
     return this.list.filter(item => this.filter(item, spec)).length;
   }
 
-  async visit(spec, visitor) {
+  visit(spec, visitor) {
     assert(isFunction(visitor));
     this.list.filter(item => this.filter(item, spec)).forEach(visitor);
+  }
+
+  first(spec, sort) {
+    if (!spec) {
+      return this.list[0];
+    }
+    return this.list.filter(item => this.filter(item, spec)).sort((a, b) => this.sort(a, b, sort))[0];
+  }
+
+  sort(a, b, options) {
+    if (typeof options == 'object') {
+        for (const p in options) {
+          
+        }
+    } else {
+      return a > b
+        ? 1
+        : a == b
+          ? 0
+          : -1;
+    }
+  }
+
+  delete(sepc, options) {
+    const removes = this.list.filter(item => this.filter(item, spec));
+    removes.forEach(item => {
+      this.list.splice(this.list.indexOf(item), 1);
+    })
   }
 
   select(spec) {

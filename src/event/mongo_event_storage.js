@@ -1,11 +1,6 @@
-import {
-  MongoClient
-} from 'mongodb';
+import {MongoClient} from 'mongodb';
 import config from '../config';
-import {
-  expr,
-  isFunction
-} from '../utils';
+import {expr, isFunction} from '../utils';
 import EventStorage from './event_storage';
 import assert from 'assert';
 
@@ -32,9 +27,7 @@ export default class MySqlEventStorage extends EventStorage {
       const collections = await db.collections();
       if (collections.indexOf(this.collection) == -1) {
         const collection = await db.createCollection(this.collection);
-        collection.createIndex({
-          version: 1
-        });
+        collection.createIndex({version: 1});
       }
       this.exists = true;
     }
@@ -64,9 +57,7 @@ export default class MySqlEventStorage extends EventStorage {
     assert(isFunction(visitor));
     const db = await this.connect();
     try {
-      const cursor = await db.collection(this.collection).find(this._getQuery(spec)).sort({
-        timestamp: 1
-      });
+      const cursor = await db.collection(this.collection).find(this._getQuery(spec)).sort({timestamp: 1});
       while (await cursor.hasNext()) {
         const item = await cursor.next();
         const {
@@ -83,19 +74,42 @@ export default class MySqlEventStorage extends EventStorage {
     }
   }
 
-  async select(spec) {
+  async first(spec, sort) {
+    const db = await this.connect();
+    try {
+      const {
+        _id,
+        ...other
+      } = await db.collection(this.collection).findOne(spec, {sort});
+      return {
+        id: _id,
+        ...other
+      };
+    } finally {
+      db.close();
+    }
+  }
+
+  async select(spec, sort) {
     const db = await this.connect();
     try {
       // 由小到大排序
-      return (await db.collection(this.collection).find(this._getQuery(spec)).sort({
-        version: 1
-      }).toArray()).map(({
+      return (await db.collection(this.collection).find(this._getQuery(spec)).sort(sort).toArray()).map(({
         _id,
         ...other
       }) => ({
         id: _id,
         ...other
       }));
+    } finally {
+      db.close();
+    }
+  }
+
+  async delete(spec, options) {
+    const db = await this.connect();
+    try {
+      await db.collection(this.collection).findAll(this._getQuery(spec)).destroy(options);
     } finally {
       db.close();
     }

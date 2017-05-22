@@ -2,6 +2,20 @@ import path from 'path';
 import fs from 'fs';
 import config from './config';
 export uuid from 'uuid';
+import log4js from 'log4js';
+
+log4js.configure({
+  "appenders": [{
+    type: 'console',
+  // }, {
+  //   "type": "dateFile",
+  //   "filename":   path.dirname(__dirname) + path.sep + 'runtime' + path.sep + 'logs' + path.sep +'server.txt',
+  //   "pattern": "_yyyy-MM-dd",
+  //   "alwaysIncludePattern": false
+  }]
+});
+
+export const logger = log4js.getLogger();
 
 export const isFile = file => {
   return fs.statSync(file).isFile();
@@ -12,9 +26,9 @@ export const isDir = file => {
 export const log = (...msgs) => {
   if (config.get('log').enable) {
     if (typeof msgs[0] == 'object' && msgs[0].message)
-      console.log(msgs[0].message);
+      logger.warn(msgs[0].message);
     else
-      console.log.apply(console.log, msgs);
+      logger.info(msgs);
     }
   };
 export const sep = path.sep;
