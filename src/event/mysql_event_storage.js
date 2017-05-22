@@ -25,6 +25,8 @@ export default class MySqlEventStorage extends EventStorage {
     });
   }
 
+ 
+
   select(spec) {
     return new Promise(function(resolve, reject) {
       this.db.query('select name,id,data,timestamp from ?? where ?? order by version asc ', [
