@@ -26,7 +26,7 @@ export default class MySqlEventStorage extends EventStorage {
     });
   }
 
-  async visit(spec, visitor) {
+  async visit(spec, sort, visitor) {
     assert(isFunction(visitor));
     return new Promise(function(resolve, reject) {
       // todo

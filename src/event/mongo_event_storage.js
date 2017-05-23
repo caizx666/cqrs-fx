@@ -53,11 +53,11 @@ export default class MySqlEventStorage extends EventStorage {
     return await db.collection(this.collection).count(spec);
   }
 
-  async visit(spec, visitor) {
+  async visit(spec, sort, visitor) {
     assert(isFunction(visitor));
     const db = await this.connect();
     try {
-      const cursor = await db.collection(this.collection).find(this._getQuery(spec)).sort({timestamp: 1});
+      const cursor = await db.collection(this.collection).find(this._getQuery(spec)).sort(sort);
       while (await cursor.hasNext()) {
         const item = await cursor.next();
         const {
