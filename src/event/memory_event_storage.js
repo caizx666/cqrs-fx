@@ -14,7 +14,7 @@ export default class MemoryEventStorage extends EventStorage {
     return this.list.filter(item => this.filter(item, spec)).length;
   }
 
-  visit(spec, sort, visitor) {
+  async visit(spec, sort, visitor) {
     assert(isFunction(visitor));
     let ret = this.list;
     if (typeof spec == 'object') {
@@ -23,7 +23,9 @@ export default class MemoryEventStorage extends EventStorage {
     if (typeof options == 'object') {
       ret.sort((a, b) => this.sort(a, b, sort));
     }
-    ret.forEach(visitor);
+    for (const item of ret) {
+      await visitor(item);
+    }
   }
 
   first(spec, sort) {
@@ -42,7 +44,7 @@ export default class MemoryEventStorage extends EventStorage {
 
   sort(a, b, options) {
     for (const p in options) {
-      if (options[p]>0 || options[p] =='DESC') {
+      if (options[p] > 0 || options[p] == 'DESC') {
         return a[p] < b[p] ?
           1 :
           a[p] == b[p] ?
