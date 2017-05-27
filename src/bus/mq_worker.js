@@ -42,15 +42,19 @@ export default class MqWorker {
   }
 
   pause() {
-    queue.pause().then(function() {
+    this.queue.pause().then(function() {
       this._isrunning = false;
     });
   }
 
   resume() {
-    queue.resume().then(function() {
+    this.queue.resume().then(function() {
       this._isrunning = true;
     });
+  }
+
+  stop(){
+    this.queue.close();
   }
 
 }
