@@ -23,7 +23,6 @@ export default class MongoEventStorage extends EventStorage {
     };
     this.url = url;
     this.options = options;
-
   }
 
   async connect() {

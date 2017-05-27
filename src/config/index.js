@@ -3,6 +3,7 @@ import {
   sep,
   exists
 } from '../utils';
+import {fxData} from '../core';
 
  class config {
   rootConfig = __dirname;
@@ -14,6 +15,8 @@ import {
     this.appPath = options.appPath;
     this.configCache = {};
     this.initConfig = Object.assign({}, options);
+    // 配置变了实例对象需要重建
+    fxData.container = {};
   }
 
   clear() {
