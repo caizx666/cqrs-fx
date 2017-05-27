@@ -28,7 +28,7 @@ export const log = (...msgs) => {
     if (typeof msgs[0] == 'object' && msgs[0].message)
       logger.warn(msgs[0].message);
     else
-      logger.info(...msgs);
+      logger.debug(...msgs);
     }
   };
 export const sep = path.sep;

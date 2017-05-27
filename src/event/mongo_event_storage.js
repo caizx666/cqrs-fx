@@ -9,7 +9,7 @@ import {
 import EventStorage from './event_storage';
 import assert from 'assert';
 
-export default class MySqlEventStorage extends EventStorage {
+export default class MongoEventStorage extends EventStorage {
   constructor() {
     super();
     this.collection = config.get('event').collection;
@@ -41,10 +41,11 @@ export default class MySqlEventStorage extends EventStorage {
     return db;
   }
 
-  _getQuery({
-    id,
-    ...other
-  }) {
+  _getQuery(spec) {
+    const {
+      id,
+      ...other
+    } = spec || {};
     if (id !== undefined) {
       return {
         _id: id,

@@ -25,7 +25,8 @@ export default class MessageDispatcher extends Dispatcher {
   _handlers = {};
 
   createAndRegisterAlias() {
-    Object.keys(fxData.alias).filter(item => item.indexOf(`/${this.type}/`) > -1).map(alias => _require(alias)).forEach((type) => this.registerHandler(type));
+    this._handlers = {};
+    Object.keys(fxData.alias).filter(alias => alias.split('/')[1] === this.type).map(alias => _require(alias)).forEach((type) => this.registerHandler(type));
   }
 
   getHandlers(name, module) {
@@ -62,7 +63,6 @@ export default class MessageDispatcher extends Dispatcher {
         module = ctoken.module,
           name = p
       } = this.type === 'event' ? getEventToken(handlerType.prototype[p]) : getCommandToken(handlerType.prototype[p]);
-
       if (module && name) {
         let items = this._handlers[`${module}/${name}`];
         if (!items) {
@@ -73,6 +73,7 @@ export default class MessageDispatcher extends Dispatcher {
             CLS: handlerType,
             method: p
           });
+          log(i18n.t('注册'), handlerType.name + '.' + p);
         }
       } else {
         log(i18n.t('注册失败'), handlerType.name + '.' + p)
