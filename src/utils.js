@@ -7,6 +7,10 @@ import log4js from 'log4js';
 log4js.configure({
   "appenders": [{
     type: 'console',
+    layout: {
+        type: 'pattern',
+        pattern: "\x1B[90m[%d]\x1B[39m \x1B[36m[CQRS]\x1B[39m %[%m%]"
+      }
   // }, {
   //   "type": "dateFile",
   //   "filename":   path.dirname(__dirname) + path.sep + 'runtime' + path.sep + 'logs' + path.sep +'server.txt',
