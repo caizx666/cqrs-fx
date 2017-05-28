@@ -14,6 +14,18 @@ export default class MySqlEventStorage extends EventStorage {
     });
   }
 
+  first(spec, sort) {
+    return new Promise(function(resolve, reject) {
+      this.db.query('select name,id,data,timestamp from ?? where ?? order by version asc limit 0,1', [
+        this._tableName, expr(spec)
+      ], function(err, rows, fields) {
+        if (err)
+          reject(err);
+        resolve(rows[0], fields);
+      });
+    });
+  }
+
   async count(spec) {
     return new Promise(function(resolve, reject) {
       this.db.query('select count(*) from ?? where ?? ', [
@@ -26,7 +38,7 @@ export default class MySqlEventStorage extends EventStorage {
     });
   }
 
-  async visit(spec, visitor) {
+  async visit(spec, sort, visitor) {
     assert(isFunction(visitor));
     return new Promise(function(resolve, reject) {
       // todo

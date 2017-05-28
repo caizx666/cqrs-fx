@@ -1,10 +1,15 @@
-import {MongoClient} from 'mongodb';
+import {
+  MongoClient
+} from 'mongodb';
 import config from '../config';
-import {expr, isFunction} from '../utils';
+import {
+  expr,
+  isFunction
+} from '../utils';
 import EventStorage from './event_storage';
 import assert from 'assert';
 
-export default class MySqlEventStorage extends EventStorage {
+export default class MongoEventStorage extends EventStorage {
   constructor() {
     super();
     this.collection = config.get('event').collection;
@@ -18,7 +23,6 @@ export default class MySqlEventStorage extends EventStorage {
     };
     this.url = url;
     this.options = options;
-
   }
 
   async connect() {
@@ -27,17 +31,20 @@ export default class MySqlEventStorage extends EventStorage {
       const collections = await db.collections();
       if (collections.indexOf(this.collection) == -1) {
         const collection = await db.createCollection(this.collection);
-        collection.createIndex({version: 1});
+        collection.createIndex({
+          version: 1
+        });
       }
       this.exists = true;
     }
     return db;
   }
 
-  _getQuery({
-    id,
-    ...other
-  }) {
+  _getQuery(spec) {
+    const {
+      id,
+      ...other
+    } = spec || {};
     if (id !== undefined) {
       return {
         _id: id,
@@ -53,11 +60,11 @@ export default class MySqlEventStorage extends EventStorage {
     return await db.collection(this.collection).count(spec);
   }
 
-  async visit(spec, visitor) {
+  async visit(spec, sort, visitor) {
     assert(isFunction(visitor));
     const db = await this.connect();
     try {
-      const cursor = await db.collection(this.collection).find(this._getQuery(spec)).sort({timestamp: 1});
+      const cursor = await db.collection(this.collection).find(this._getQuery(spec)).sort(sort);
       while (await cursor.hasNext()) {
         const item = await cursor.next();
         const {
@@ -77,10 +84,16 @@ export default class MySqlEventStorage extends EventStorage {
   async first(spec, sort) {
     const db = await this.connect();
     try {
+      const ret = await db.collection(this.collection).findOne(spec, {
+        sort
+      });
+      if (!ret) {
+        return null;
+      }
       const {
         _id,
         ...other
-      } = await db.collection(this.collection).findOne(spec, {sort});
+      } = ret;
       return {
         id: _id,
         ...other
@@ -109,7 +122,7 @@ export default class MySqlEventStorage extends EventStorage {
   async delete(spec, options) {
     const db = await this.connect();
     try {
-      await db.collection(this.collection).findAll(this._getQuery(spec)).destroy(options);
+      await db.collection(this.collection).deleteMany(this._getQuery(spec), options);
     } finally {
       db.close();
     }

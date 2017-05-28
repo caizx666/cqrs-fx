@@ -1,9 +1,11 @@
-import {assert} from 'chai';
+import {
+  assert
+} from 'chai';
 
 import MemoryEventStorage from '../../src/event/memory_event_storage';
 
-describe('MemoryEventStorage', function() {
-  it('可以提交读取数据', function() {
+describe('MemoryEventStorage', function () {
+  it('可以提交读取数据', function () {
     const store = new MemoryEventStorage();
     let c = store.count();
     assert.equal(c, 0);
@@ -29,7 +31,9 @@ describe('MemoryEventStorage', function() {
     c = store.count()
     assert.equal(1, c);
 
-    let item = store.select({id: 1});
+    let item = store.select({
+      id: 1
+    });
     assert.equal(item.length, 1);
 
     item = item[0];
@@ -50,7 +54,7 @@ describe('MemoryEventStorage', function() {
 
   });
 
-  it('支持visit访问', async function() {
+  it('支持visit访问', async function () {
 
     const store = new MemoryEventStorage();
 
@@ -98,7 +102,7 @@ describe('MemoryEventStorage', function() {
     let c = 0;
     await store.visit({
       module: 'mm'
-    }, (item) => {
+    },{}, (item) => {
       assert.equal(item.id, 10000 + c);
       c++;
     });
@@ -106,7 +110,7 @@ describe('MemoryEventStorage', function() {
     assert.equal(c, 1000);
   });
 
-  it('支持类似mongodb的表达式', async function() {
+  it('支持类似mongodb的表达式', async function () {
     const store = new MemoryEventStorage();
     assert(store.filter({
       key: 100
@@ -114,7 +118,7 @@ describe('MemoryEventStorage', function() {
       key: {
         $gt: 99
       }
-    }) === true);  
+    }) === true);
     assert(store.filter({
       key: 100
     }, {
@@ -167,4 +171,58 @@ describe('MemoryEventStorage', function() {
       }
     }) === true);
   });
+
+  it('支持排序', async function () {
+    const store = new MemoryEventStorage();
+    //ASC
+    assert(store.sort({
+      key: 11
+    }, {
+      key: 99
+    }, {
+      key: -1
+    })<0);
+
+    assert(store.sort({
+      key: 11
+    }, {
+      key: 11
+    }, {
+      key: -1
+    })==0);
+
+    assert(store.sort({
+      key: 22
+    }, {
+      key: 11
+    }, {
+      key: -1
+    })>0);
+
+// DESC
+    assert(store.sort({
+      key: 11
+    }, {
+      key: 99
+    }, {
+      key: 1
+    })>0);
+
+    assert(store.sort({
+      key: 11
+    }, {
+      key: 11
+    }, {
+      key: -1
+    })==0);
+
+    assert(store.sort({
+      key: 22
+    }, {
+      key: 11
+    }, {
+      key: 1
+    })<0);
+  });
+
 });

@@ -36,6 +36,13 @@ export function alias(type, paths) {
       }
       let name = file.slice(0, -3).replace(/\\/g, '/'); //replace \\ to / on windows
       name = type + '/' + name;
+      // 这里需要dispatcher重新register
+      if (type.endsWith('/command')){
+        delete fxData.container['commandDispatcher'];
+      }
+      if (type.endsWith('/event')){
+        delete fxData.container['eventDispatcher'];
+      }
       fxData.alias[name] = `${path}${sep}${file}`;
     });
   });

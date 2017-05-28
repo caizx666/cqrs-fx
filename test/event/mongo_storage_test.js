@@ -128,10 +128,12 @@ describe('MongoEventStorage', function () {
     let c = 0;
     await store.visit({
       module: 'mm'
-    }, (item) => {
+    }, {}, (item) => {
       assert.equal(item.id, c);
       c++;
     });
+
+    await store.drop();
 
   assert.equal(c, 1000);
   });

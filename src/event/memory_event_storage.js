@@ -1,6 +1,8 @@
 import EventStorage from './event_storage';
 import assert from 'assert';
-import {isFunction} from '../utils'
+import {
+  isFunction
+} from '../utils'
 
 export default class MemoryEventStorage extends EventStorage {
   list = [];
@@ -12,35 +14,58 @@ export default class MemoryEventStorage extends EventStorage {
     return this.list.filter(item => this.filter(item, spec)).length;
   }
 
-  visit(spec, visitor) {
+  async visit(spec, sort, visitor) {
     assert(isFunction(visitor));
-    this.list.filter(item => this.filter(item, spec)).forEach(visitor);
+    let ret = this.list;
+    if (typeof spec == 'object') {
+      ret = ret.filter(item => this.filter(item, spec));
+    }
+    if (typeof options == 'object') {
+      ret.sort((a, b) => this.sort(a, b, sort));
+    }
+    for (const item of ret) {
+      await visitor(item);
+    }
   }
 
   first(spec, sort) {
     if (!spec) {
       return this.list[0];
     }
-    return this.list.filter(item => this.filter(item, spec)).sort((a, b) => this.sort(a, b, sort))[0];
+    let ret = this.list;
+    if (typeof spec == 'object') {
+      ret = ret.filter(item => this.filter(item, spec));
+    }
+    if (typeof options == 'object') {
+      ret.sort((a, b) => this.sort(a, b, sort));
+    }
+    return ret[0];
   }
 
   sort(a, b, options) {
-    if (typeof options == 'object') {
-        for (const p in options) {
-          
-        }
-    } else {
-      return a > b
-        ? 1
-        : a == b
-          ? 0
-          : -1;
+    for (const p in options) {
+      if (options[p] > 0 || options[p] == 'DESC') {
+        return a[p] < b[p] ?
+          1 :
+          a[p] == b[p] ?
+          0 :
+          -1;
+      } else {
+        return a[p] < b[p] ?
+          -1 :
+          a[p] == b[p] ?
+          0 :
+          1;
+      }
     }
   }
 
   delete(sepc, options) {
-    const removes = this.list.filter(item => this.filter(item, spec));
-    removes.forEach(item => {
+    let ret = this.list;
+    if (typeof spec == 'object') {
+      ret = ret.filter(item => this.filter(item, spec));
+    }
+    ret.forEach(item => {
       this.list.splice(this.list.indexOf(item), 1);
     })
   }
