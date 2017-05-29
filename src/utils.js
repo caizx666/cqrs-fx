@@ -5,18 +5,20 @@ export uuid from 'uuid';
 import log4js from 'log4js';
 
 log4js.configure({
-  "appenders": [{
-    type: 'console',
-    layout: {
+  "appenders": [
+    {
+      type: 'console',
+      layout: {
         type: 'pattern',
         pattern: "\x1B[90m[%d]\x1B[39m \x1B[36m[CQRS]\x1B[39m %[%m%]"
       }
-  // }, {
-  //   "type": "dateFile",
-  //   "filename":   path.dirname(__dirname) + path.sep + 'runtime' + path.sep + 'logs' + path.sep +'server.txt',
-  //   "pattern": "_yyyy-MM-dd",
-  //   "alwaysIncludePattern": false
-  }]
+      // }, {
+      //   "type": "dateFile",
+      //   "filename":   path.dirname(__dirname) + path.sep + 'runtime' + path.sep + 'logs' + path.sep +'server.txt',
+      //   "pattern": "_yyyy-MM-dd",
+      //   "alwaysIncludePattern": false
+    }
+  ]
 });
 
 export const logger = log4js.getLogger();
@@ -28,13 +30,14 @@ export const isDir = file => {
   return fs.statSync(file).isDirectory();
 };
 export const log = (...msgs) => {
-  if (config.get('log').enable) {
-    if (typeof msgs[0] == 'object' && msgs[0].message)
-      logger.warn(msgs[0].message);
-    else
-      logger.debug(...msgs);
-    }
-  };
+  logger.debug(...msgs);
+};
+export const warn = (...msgs) => {
+  logger.warn(...msgs);
+};
+export const error = (...msgs) => {
+  logger.error(...msgs);
+};
 export const sep = path.sep;
 export const normalize = path.normalize;
 export const join = () => {

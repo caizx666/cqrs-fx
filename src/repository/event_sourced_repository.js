@@ -1,7 +1,7 @@
 import {getProvider as getSnapshotProvider} from '../snapshot';
 import aggregate from '../aggregate';
 import {getStorage as getEventStorage} from '../event';
-import {isFunction, isString, log} from '../utils';
+import {isFunction, isString, warn} from '../utils';
 import err from '../err';
 import {getEventBus} from '../bus';
 import i18n from '../i18n';
@@ -23,7 +23,7 @@ export default class EventSourcedRepository extends Repository {
     if (!isString(module)) {
       const mn = name.split('/');
       if (mn.length != 2) {
-        log(i18n.t('领域对象无法找到') + name);
+        warn(i18n.t('领域对象不存在，所属模块未知'), name);
         return null;
       }
       module = mn[0];
@@ -47,7 +47,7 @@ export default class EventSourcedRepository extends Repository {
       if (evnts != null && evnts.length > 0) {
         aggregateRoot.buildFromHistory(...evnts);
       } else {
-        log(i18n.t('领域对象未能在数据库中找到'));
+        warn(i18n.t('领域对象无初始化事件'), name);
         return null;
       }
     }
