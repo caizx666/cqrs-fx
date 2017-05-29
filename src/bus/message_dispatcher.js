@@ -1,4 +1,4 @@
-import {log, isFunction, isString, getClassName} from '../utils';
+import {log, warn, isFunction, isString, getClassName} from '../utils';
 import {fxData, _require} from '../core';
 import i18n from '../i18n';
 import Dispatcher from './dispatcher';
@@ -66,7 +66,7 @@ export default class MessageDispatcher extends Dispatcher {
           log(i18n.t('注册'), getClassName(handlerType) + '.' + p);
         }
       } else {
-        log(i18n.t('注册失败'), getClassName(handlerType) + '.' + p)
+        warn(i18n.t('注册失败'), getClassName(handlerType) + '.' + p)
       }
     }
   }
@@ -150,7 +150,7 @@ export default class MessageDispatcher extends Dispatcher {
       log(i18n.t('完成执行') + this.type + ' ' + `${module}/${name} (${id})`);
       return true;
     } catch (err) {
-      log(i18n.t('失败执行') + this.type + ' ' + `${module}/${name} (${id})`);
+      warn(i18n.t('失败执行') + this.type + ' ' + `${module}/${name} (${id})`);
       console.warn(err, err.stack);
       await this._onDispatchFaild(message, 'error', err, curHandler);
     }

@@ -27,12 +27,12 @@ export default class MqWorker {
     return this._queue;
   }
 
-  async run() {
+  run() {
     if (this._isrunning) {
       return;
     }
     this._isrunning = true;
-    await this.queue.process(async(job) => {
+    this.queue.process(async(job) => {
       log(i18n.t('收到mq消息'));
       await getDispatcher(this.type).dispatch({
         ...job.data,
@@ -53,7 +53,7 @@ export default class MqWorker {
     });
   }
 
-  stop(){
+  stop() {
     this.queue.close();
   }
 

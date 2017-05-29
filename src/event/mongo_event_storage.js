@@ -1,11 +1,6 @@
-import {
-  MongoClient
-} from 'mongodb';
+import {MongoClient} from 'mongodb';
 import config from '../config';
-import {
-  expr,
-  isFunction
-} from '../utils';
+import {expr, isFunction} from '../utils';
 import EventStorage from './event_storage';
 import assert from 'assert';
 
@@ -31,9 +26,7 @@ export default class MongoEventStorage extends EventStorage {
       const collections = await db.collections();
       if (collections.indexOf(this.collection) == -1) {
         const collection = await db.createCollection(this.collection);
-        collection.createIndex({
-          version: 1
-        });
+        collection.createIndex({version: 1});
       }
       this.exists = true;
     }
@@ -84,9 +77,7 @@ export default class MongoEventStorage extends EventStorage {
   async first(spec, sort) {
     const db = await this.connect();
     try {
-      const ret = await db.collection(this.collection).findOne(spec, {
-        sort
-      });
+      const ret = await db.collection(this.collection).findOne(spec, {sort});
       if (!ret) {
         return null;
       }
@@ -129,6 +120,9 @@ export default class MongoEventStorage extends EventStorage {
   }
 
   async commit() {
+    if (this._addList.length <= 0) {
+      return;
+    }
     const db = await this.connect();
     try {
       await db.collection(this.collection).insertMany(this._addList.map(({
