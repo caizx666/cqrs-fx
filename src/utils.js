@@ -40,9 +40,19 @@ export const log = (...msgs) => {
   }
 };
 export const warn = (...msgs) => {
+  const cfg = config.get('log');
+  const logging = cfg.logging;
+  if (typeof logging == 'function') {
+    return logging(...msgs);
+  }
   logger.warn(...msgs);
 };
 export const error = (...msgs) => {
+  const cfg = config.get('log');
+  const logging = cfg.logging;
+  if (typeof logging == 'function') {
+    return logging(...msgs);
+  }
   logger.error(...msgs);
 };
 export const sep = path.sep;
