@@ -30,7 +30,14 @@ export const isDir = file => {
   return fs.statSync(file).isDirectory();
 };
 export const log = (...msgs) => {
-  logger.debug(...msgs);
+  const cfg = config.get('log');
+  if (cfg.enable) {
+    const logging = cfg.logging;
+    if (typeof logging == 'function') {
+      return logging(...msgs);
+    }
+    logger.debug(...msgs);
+  }
 };
 export const warn = (...msgs) => {
   logger.warn(...msgs);
@@ -157,4 +164,19 @@ export function merge(...args) {
     }
   }
   return obj;
+}
+
+export function getClassName(Type) {
+  assert(Type);
+  if (Type.name != '_class') {
+    return Type.name;
+  }
+  const filename = Type.prototype.__filename;
+  if (filename) {
+    const sp = filename.split(path.sep);
+    const name = sp[sp.length - 1];
+    const extIndex = name.lastIndexOf('.');
+    return name.substr(0, extIndex);
+  }
+  return Type.name;
 }

@@ -1,3 +1,4 @@
 export default {
-  enable: false
+  enable: false,
+  logging: null
 }
