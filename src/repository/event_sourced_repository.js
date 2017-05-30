@@ -1,7 +1,7 @@
 import {getProvider as getSnapshotProvider} from '../snapshot';
 import aggregate from '../aggregate';
 import {getStorage as getEventStorage} from '../event';
-import {isFunction, isString, warn} from '../utils';
+import {isFunction, isString, warn, error} from '../utils';
 import err from '../err';
 import {getEventBus} from '../bus';
 import i18n from '../i18n';
@@ -9,6 +9,11 @@ import Repository from './repository';
 
 export default class EventSourcedRepository extends Repository {
   _saveHash = []
+  _committed = true
+
+  get committed(){
+    return this._committed;
+  }
 
   createAggregate(module, name, id, props) {
     let CLS = aggregate.get(name, module);
@@ -58,6 +63,7 @@ export default class EventSourcedRepository extends Repository {
     if (this._saveHash.indexOf(aggregate) > -1)
       return;
     this._saveHash.push(aggregate);
+    this._committed = false;
   }
 
   async commit() {
@@ -76,11 +82,19 @@ export default class EventSourcedRepository extends Repository {
         await eventBus.publish(evt);
       }
     }
-    // todo 这里需要事务
-    await eventStorage.commit();
-    await eventBus.commit();
-    if (snapshotProvider && snapshotProvider.option == 'immediate') {
-      await snapshotProvider.commit();
+    try {
+      await eventStorage.commit();
+      await eventBus.commit();
+      if (snapshotProvider && snapshotProvider.option == 'immediate') {
+        await snapshotProvider.commit();
+      }
+        for (let aggregateRoot of this._saveHash) {
+          aggregateRoot._updateVersionAndClearUncommittedEvents();
+        }
+      this._committed = true;
+      this._saveHash.length = 0;
+    } catch (err) {
+      error(i18n.t('提交失败'), err);
     }
   }
 

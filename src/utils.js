@@ -41,7 +41,7 @@ export const log = (...msgs) => {
 };
 export const warn = (...msgs) => {
   const cfg = config.get('log');
-  const logging = cfg.logging;
+  const logging = cfg.warning || cfg.logging;
   if (typeof logging == 'function') {
     return logging(...msgs);
   }
@@ -49,7 +49,7 @@ export const warn = (...msgs) => {
 };
 export const error = (...msgs) => {
   const cfg = config.get('log');
-  const logging = cfg.logging;
+  const logging = cfg.error || cfg.logging;
   if (typeof logging == 'function') {
     return logging(...msgs);
   }

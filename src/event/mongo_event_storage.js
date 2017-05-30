@@ -123,7 +123,7 @@ export default class MongoEventStorage extends EventStorage {
     if (this._addList.length <= 0) {
       return;
     }
-    const db = await this.connect();
+    const db = await this.connect(); 
     try {
       await db.collection(this.collection).insertMany(this._addList.map(({
         id,

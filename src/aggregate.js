@@ -96,6 +96,11 @@ export default class Aggregate {
     }
   }
 
+  _updateVersionAndClearUncommittedEvents(){
+    this._version = this.version;
+    this._uncommittedEvents.length = 0;
+  }
+
   buildFromSnapshot(snapshot) {
     this._branch = snapshot.branch;
     this._version = snapshot.version;

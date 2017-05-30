@@ -22,9 +22,12 @@ export default class DomainEventStorage extends EventStorage {
         source_type: aggregateRootAlias,
         source_id: id,
         version: ['<', version]
-      });
+      }, {version: -1});
     } else {
-      results = await this.eventStorage.select({source_type: aggregateRootAlias, source_id: id});
+      results = await this.eventStorage.select({
+        source_type: aggregateRootAlias,
+        source_id: id
+      }, {version: -1});
     }
     return results.map(s => ({
       id: s.id,
