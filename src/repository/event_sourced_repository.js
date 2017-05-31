@@ -1,9 +1,19 @@
-import {getProvider as getSnapshotProvider} from '../snapshot';
+import {
+  getProvider as getSnapshotProvider
+} from '../snapshot';
 import aggregate from '../aggregate';
-import {getStorage as getEventStorage} from '../event';
-import {isFunction, isString, warn} from '../utils';
+import {
+  getStorage as getEventStorage
+} from '../event';
+import {
+  isFunction,
+  isString,
+  warn
+} from '../utils';
 import err from '../err';
-import {getEventBus} from '../bus';
+import {
+  getEventBus
+} from '../bus';
 import i18n from '../i18n';
 import Repository from './repository';
 
@@ -40,8 +50,7 @@ export default class EventSourcedRepository extends Repository {
       var eventsAfterSnapshot = await getEventStorage().loadEvents(aggregateRootAlias, id, snapshot.version);
       if (eventsAfterSnapshot && eventsAfterSnapshot.length > 0)
         aggregateRoot.buildFromHistory(...eventsAfterSnapshot);
-      }
-    else {
+    } else {
       aggregateRoot.id = id;
       let evnts = await getEventStorage().loadEvents(aggregateRootAlias, id);
       if (evnts != null && evnts.length > 0) {
@@ -82,6 +91,10 @@ export default class EventSourcedRepository extends Repository {
     if (snapshotProvider && snapshotProvider.option == 'immediate') {
       await snapshotProvider.commit();
     }
+    for (let aggregateRoot of this._saveHash) {
+      aggregateRoot._updateVerisonAndClearUnCommitEvents();
+    }
+    this._saveHash.length = 0;
   }
 
   async rollback() {
