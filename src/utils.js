@@ -178,7 +178,7 @@ export function merge(...args) {
 
 export function getClassName(Type) {
   assert(Type);
-  if (Type.name != '_class') {
+  if (Type.name != '_class' && Type.name != '_default') {
     return Type.name;
   }
   const filename = Type.prototype.__filename;
