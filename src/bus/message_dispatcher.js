@@ -1,9 +1,22 @@
-import {log, warn, isFunction, isString, getClassName} from '../utils';
-import {fxData, _require} from '../core';
+import {
+  log,
+  warn,
+  isFunction,
+  isString,
+  getClassName
+} from '../utils';
+import {
+  fxData,
+  _require
+} from '../core';
 import i18n from '../i18n';
 import Dispatcher from './dispatcher';
-import {getDecoratorToken as getCommandToken} from '../command/decorator';
-import {getDecoratorToken as getEventToken} from '../event/decorator';
+import {
+  getDecoratorToken as getCommandToken
+} from '../command/decorator';
+import {
+  getDecoratorToken as getEventToken
+} from '../event/decorator';
 import assert from 'assert';
 
 export default class MessageDispatcher extends Dispatcher {
@@ -31,12 +44,12 @@ export default class MessageDispatcher extends Dispatcher {
 
   registerHandler(handlerType) {
     assert(handlerType);
-    let ctoken = this.type === 'event'
-      ? getEventToken(handlerType)
-      : getCommandToken(handlerType);
+    let ctoken = this.type === 'event' ?
+      getEventToken(handlerType) :
+      getCommandToken(handlerType);
     if (!ctoken.name && !ctoken.module) {
       if (!handlerType.prototype) {
-        log(i18n.t('不支持的handler类型'));
+        warn(i18n.t('不支持的handler类型'));
       }
       ctoken = {
         module: handlerType.prototype.__module,
@@ -52,18 +65,23 @@ export default class MessageDispatcher extends Dispatcher {
       }
       let {
         module = ctoken.module,
-        name = p
-      } = this.type === 'event'
-        ? getEventToken(handlerType.prototype[p])
-        : getCommandToken(handlerType.prototype[p]);
+          name = p
+      } = this.type === 'event' ?
+        getEventToken(handlerType.prototype[p]) :
+        getCommandToken(handlerType.prototype[p]);
       if (module && name) {
         let items = this._handlers[`${module}/${name}`];
         if (!items) {
           this._handlers[`${module}/${name}`] = items = [];
         }
-        if (!items.find(item => item.CLS.name == handlerType.name && item.method == p)) {
-          items.push({CLS: handlerType, method: p});
+        if (!items.find(item => item.CLS == handlerType && item.method == p)) {
+          items.push({
+            CLS: handlerType,
+            method: p
+          });
           log(i18n.t('注册'), getClassName(handlerType) + '.' + p);
+        } else {
+          log(i18n.t('跳过'), getClassName(handlerType) + '.' + p)
         }
       } else {
         warn(i18n.t('注册失败'), getClassName(handlerType) + '.' + p)
@@ -72,16 +90,16 @@ export default class MessageDispatcher extends Dispatcher {
   }
 
   unregisterHandler(handler) {
-    const ctoken = this.type === 'event'
-      ? getEventToken(handlerType)
-      : getCommandToken(handlerType);
+    const ctoken = this.type === 'event' ?
+      getEventToken(handlerType) :
+      getCommandToken(handlerType);
     for (const p in handlerType.prototype) {
       const {
         module = ctoken.module,
-        name
-      } = this.type === 'event'
-        ? getEventToken(handlerType.prototype[p])
-        : getCommandToken(handlerType.prototype[p]);
+          name
+      } = this.type === 'event' ?
+        getEventToken(handlerType.prototype[p]) :
+        getCommandToken(handlerType.prototype[p]);
       if (module && name) {
         let items = this._handlers[`${module}/${name}`];
         if (!items) {
@@ -100,22 +118,22 @@ export default class MessageDispatcher extends Dispatcher {
   async dispatch(message) {
     if (!isString(message.id)) {
       this._onDispatchFaild(message, 'nomessage');
-      log(i18n.t('消息id无效'));
+      warn(i18n.t('消息id无效'));
       return;
     }
     if (!isString(message.name)) {
       this._onDispatchFaild(message, 'nomessage');
-      log(i18n.t('消息name无效'));
+      warn(i18n.t('消息name无效'));
       return;
     }
     if (message.type !== 'event' && message.type !== 'command') {
       this._onDispatchFaild(message, 'nomessage');
-      log(i18n.t('消息type无效'));
+      warn(i18n.t('消息type无效'));
       return;
     }
     if (message.type !== this.type) {
       this._onDispatchFaild(message, 'notsupport');
-      log(message.type + i18n.t('消息无法分发'));
+      warn(message.type + i18n.t('消息无法分发'));
       return;
     }
     const id = message.id;
@@ -123,36 +141,38 @@ export default class MessageDispatcher extends Dispatcher {
     const name = message.name;
     if (!module) {
       this._onDispatchFaild(message, 'nomodule');
-      log(i18n.t('消息module无效'));
+      warn(i18n.t('消息module无效'));
       return;
     }
     const handlers = this.getHandlers(name, module);
     if (!handlers || handlers.length <= 0) {
       this._onDispatchFaild(message, 'nohandler');
-      log(i18n.t('无消息处理器'));
+      warn(i18n.t('无消息处理器'));
     }
-    log(i18n.t('开始执行') + this.type + ' ' + `${module}/${name} (${id})`);
+    log(i18n.t('开始执行'), this.type, `${module}/${name} (${id})`);
     await this._onDispatching(message);
     let curHandler;
     try {
-      for (const {CLS, method}
-      of handlers) {
+      for (const {
+          CLS,
+          method
+        } of handlers) {
         curHandler = null;
         var handler = new CLS();
         curHandler = handler;
         if (!isFunction(handler[method])) {
-          log(i18n.t('处理器无法执行命令'));
+          warn(i18n.t('处理器无法执行命令'));
           continue;
         }
         await handler[method].bind(handler)(message.data || {});
       }
       await this._onDispatched(message);
-      log(i18n.t('完成执行') + this.type + ' ' + `${module}/${name} (${id})`);
+      log(i18n.t('完成执行'), this.type, `${module}/${name} (${id})`);
       return true;
     } catch (err) {
-      warn(i18n.t('失败执行') + this.type + ' ' + `${module}/${name} (${id})`);
-      console.warn(err, err.stack);
+      warn(i18n.t('失败执行'), this.type, `${module}/${name} (${id})`, err);
       await this._onDispatchFaild(message, 'error', err, curHandler);
+      return false;
     }
   }
 
@@ -169,7 +189,7 @@ export default class MessageDispatcher extends Dispatcher {
       this._dispatchedListeners.push(dispatchedListener);
     if (isFunction(dispatchFailedListener))
       this._dispatchFailedListeners.push(dispatchFailedListener);
-    }
+  }
 
   removeListener(dispatchingListener, dispatchedListener, dispatchFailedListener) {
     if (isFunction(dispatchingListener))
@@ -178,14 +198,14 @@ export default class MessageDispatcher extends Dispatcher {
       this._dispatchedListeners.splice(this._dispatchedListeners.indexOf(dispatchedListener), 1);
     if (isFunction(dispatchFailedListener))
       this._dispatchFailedListeners.splice(this._dispatchFailedListeners.indexOf(dispatchFailedListener), 1);
-    }
+  }
 
   async _onDispatching(message) {
     for (const listener of this._dispatchingListeners) {
       try {
         await listener(message);
       } catch (e) {
-        log(e);
+        warn(e);
       }
     }
   }
@@ -195,7 +215,7 @@ export default class MessageDispatcher extends Dispatcher {
       try {
         await listener(message, code, error);
       } catch (e) {
-        log(e);
+        warn(e);
       }
     }
   }
@@ -205,7 +225,7 @@ export default class MessageDispatcher extends Dispatcher {
       try {
         await listener(message, 'ok');
       } catch (e) {
-        log(e);
+        warn(e);
       }
     }
   }
