@@ -3,6 +3,7 @@ import fs from 'fs';
 import config from './config';
 export uuid from 'uuid';
 import log4js from 'log4js';
+import assert from 'assert';
 
 log4js.configure({
   "appenders": [
@@ -176,17 +177,17 @@ export function merge(...args) {
   return obj;
 }
 
-export function getClassName(Type) {
-  assert(Type);
-  if (Type.name != '_class' && Type.name != '_default') {
-    return Type.name;
+export function getClassName(Class) {
+  assert(Class);
+  if (!Class.name.startsWith('_class') && !Class.name.startsWith('_default')) {
+    return Class.name;
   }
-  const filename = Type.prototype.__filename;
+  const filename = Class.prototype.__filename;
   if (filename) {
     const sp = filename.split(path.sep);
     const name = sp[sp.length - 1];
     const extIndex = name.lastIndexOf('.');
     return name.substr(0, extIndex);
   }
-  return Type.name;
+  return Class.name;
 }

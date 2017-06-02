@@ -70,7 +70,7 @@ export default class MemoryEventStorage extends EventStorage {
     })
   }
 
-  select(spec) {
+  select(spec, sort) {
     if (!spec) {
       return [...this.list];
     }

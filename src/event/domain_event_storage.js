@@ -21,7 +21,9 @@ export default class DomainEventStorage extends EventStorage {
       results = await this.eventStorage.select({
         source_type: aggregateRootAlias,
         source_id: id,
-        version: ['<', version]
+        version: {
+          '$lt': version
+        }
       }, {version: -1});
     } else {
       results = await this.eventStorage.select({
