@@ -1,8 +1,6 @@
 import EventStorage from './event_storage';
 import assert from 'assert';
-import {
-  isFunction
-} from '../utils'
+import {isFunction} from '../utils'
 
 export default class MemoryEventStorage extends EventStorage {
   list = [];
@@ -45,17 +43,17 @@ export default class MemoryEventStorage extends EventStorage {
   sort(a, b, options) {
     for (const p in options) {
       if (options[p] > 0 || options[p] == 'DESC') {
-        return a[p] < b[p] ?
-          1 :
-          a[p] == b[p] ?
-          0 :
-          -1;
+        return a[p] < b[p]
+          ? 1
+          : a[p] == b[p]
+            ? 0
+            : -1;
       } else {
-        return a[p] < b[p] ?
-          -1 :
-          a[p] == b[p] ?
-          0 :
-          1;
+        return a[p] < b[p]
+          ? -1
+          : a[p] == b[p]
+            ? 0
+            : 1;
       }
     }
   }
@@ -127,4 +125,7 @@ export default class MemoryEventStorage extends EventStorage {
     this._addList.length = 0;
   }
 
+  async drop() {
+    this.list.length = 0;
+  }
 }

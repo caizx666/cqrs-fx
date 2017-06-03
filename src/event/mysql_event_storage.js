@@ -100,4 +100,8 @@ export default class MySqlEventStorage extends EventStorage {
     });
   }
 
+  async drop() {
+    // todo
+  }
+
 }
