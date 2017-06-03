@@ -33,7 +33,7 @@ export default class MemorySnapshotStorage extends SnapshotStorage {
 
   commit() {
     this.list = this.list.concat(this._actionList.filter(item => item.action == 0));
-   this._actionList.filter(item => item.action == 1).forEach(({spec, data}) => {
+    this._actionList.filter(item => item.action == 1).forEach(({spec, data}) => {
       let exists = this.list.find(item => {
         for (const p in spec) {
           if (item.data && item.data[p] != spec[p]) {
@@ -52,4 +52,7 @@ export default class MemorySnapshotStorage extends SnapshotStorage {
     this._actionList.length = 0;
   }
 
+  async drop() {
+    this.list.length = 0;
+  }
 }

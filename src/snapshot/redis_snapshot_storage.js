@@ -45,5 +45,7 @@ export default class RedisSnapshotStorage extends SnapshotStorage {
     }
   }
 
-
+async drop() {
+  // todo
+}
 }

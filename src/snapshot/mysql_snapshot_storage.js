@@ -38,8 +38,6 @@ export default class MySqlSnapshotStorage extends SnapshotStorage {
     });
   }
 
-
-
   commit() {
     let list = this._actionList.slice(0);
     let count = list.length;
@@ -112,5 +110,7 @@ export default class MySqlSnapshotStorage extends SnapshotStorage {
     });
   }
 
-
+  async drop() {
+    // todo
+  }
 }
