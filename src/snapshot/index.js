@@ -42,11 +42,12 @@ export function getStorage() {
         : snapshotConfig.storage;
   }
 
-  if (!(storageInstance instanceof SnapshotStorage)) {
-    throw new Error( err.configFailed,  '快照数据存储服务未正确配置，可以在config/snapshot.js中指定');
+  if (storageInstance !== null){
+    if (!(storageInstance instanceof SnapshotStorage)) {
+      throw new Error( err.configFailed,  '快照数据存储服务未正确配置，可以在config/snapshot.js中指定');
+    }    
   }
   fxData.container.snapshotStorage = storageInstance;
-
   return storageInstance;
 }
 
