@@ -94,8 +94,7 @@ export async function publish(type, ...messages) {
       name: messages[1],
       data: messages[2]
     });
-  } else if (typeof messages[0] === 'string') {
-    // 一个参数和两个参数都可能，只要是字符串
+  } else if (messages.length == 2 && typeof messages[0] === 'string') {
     const mn = messages[0].split('/');
     if (mn.length != 2) {
       throw new Error(i18n.t('消息name需要包含module/name信息'));
@@ -104,6 +103,16 @@ export async function publish(type, ...messages) {
       module: mn[0],
       name: mn[1],
       data: messages[1]
+    });
+  } else if (messages.length == 1 && typeof message[0] === 'string') {
+    const mn = messages[0].split('/');
+    if (mn.length != 2) {
+      throw new Error(i18n.t('消息name需要包含module/name信息'));
+    }
+    msgs.push({
+      module: mn[0],
+      name: mn[1],
+      data: null
     });
   } else {
     msgs = messages;
