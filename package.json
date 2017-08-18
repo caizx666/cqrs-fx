@@ -1,12 +1,12 @@
 {
   "name": "cqrs-fx",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "基于nodejs的一个 Configurable 可配置、Extensible 可扩展、EventSourced 事件溯源、Object-oriented 面向对象 的CQRS框架。",
   "main": "lib/index.js",
   "scripts": {
     "compile": "babel src --out-dir lib",
     "prepublish": "npm run compile",
-    "watch": "babel  src --watch --out-dir ../saas-plat-server/node_modules/cqrs-fx/lib  --source-maps",
+    "watch": "babel  src --watch --out-dir lib  --source-maps",
     "test": "node node_modules/mocha/bin/mocha --compilers js:babel-core/register ",
     "test-all": "node node_modules/mocha/bin/mocha --compilers js:babel-core/register test/**/*_test.js",
     "pub": "npm publish --registry http://registry.npmjs.org",
