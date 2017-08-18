@@ -1,6 +1,6 @@
 {
   "name": "cqrs-fx",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "基于nodejs的一个 Configurable 可配置、Extensible 可扩展、EventSourced 事件溯源、Object-oriented 面向对象 的CQRS框架。",
   "main": "lib/index.js",
   "scripts": {

@@ -79,7 +79,7 @@ export default class MessageDispatcher extends Dispatcher {
             CLS: handlerType,
             method: p
           });
-          log(i18n.t('注册'), getClassName(handlerType) + '.' + p);
+          log(i18n.t('注册'), getClassName(handlerType) + '.' + p, `${module}/${name}`);
         } else {
           log(i18n.t('跳过'), getClassName(handlerType) + '.' + p)
         }
