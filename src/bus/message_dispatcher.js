@@ -52,7 +52,7 @@ export default class MessageDispatcher extends Dispatcher {
         warn(i18n.t('不支持的handler类型'));
       }
       ctoken = {
-        module: handlerType.prototype.__module,
+        module: handlerType.$packageName,
         name: handlerType.name
       };
     }
@@ -79,7 +79,7 @@ export default class MessageDispatcher extends Dispatcher {
             CLS: handlerType,
             method: p
           });
-          log(i18n.t('注册'), getClassName(handlerType) + '.' + p, `${module}/${name}`);
+          log(i18n.t('注册'), getClassName(handlerType) + '.' + p, '=>', `${module}/${name}`);
         } else {
           log(i18n.t('跳过'), getClassName(handlerType) + '.' + p)
         }
