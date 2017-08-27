@@ -104,7 +104,7 @@ export async function publish(type, ...messages) {
       name: mn[1],
       data: messages[1]
     });
-  } else if (messages.length == 1 && typeof message[0] === 'string') {
+  } else if (messages.length == 1 && typeof messages[0] === 'string') {
     const mn = messages[0].split('/');
     if (mn.length != 2) {
       throw new Error(i18n.t('消息name需要包含module/name信息'));
